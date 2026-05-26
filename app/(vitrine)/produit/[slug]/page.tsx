@@ -16,13 +16,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   if (!product) notFound();
 
   const supabase = await createClient();
-  const { data: sub } = await supabase
+  const { data: subRaw } = await supabase
     .from('subcategories')
     .select('*, category:categories(*)')
     .eq('id', product.subcategory_id)
     .single();
-  if (!sub) notFound();
-  const cat = (sub as unknown as { category: { slug: string; name: string } }).category;
+  if (!subRaw) notFound();
+  const sub = subRaw as unknown as {
+    id: string;
+    slug: string;
+    name: string;
+    category: { slug: string; name: string };
+  };
+  const cat = sub.category;
 
   const suggestions = await listProductsBySubcategory(sub.id);
   const others = suggestions.filter((p) => p.id !== product.id).slice(0, 4);
