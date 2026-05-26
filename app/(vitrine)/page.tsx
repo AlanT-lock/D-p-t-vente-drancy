@@ -4,6 +4,7 @@ import { StoreBanner } from '@/components/vitrine/store-banner';
 import { Hero } from '@/components/vitrine/hero';
 import { CategoryTiles } from '@/components/vitrine/category-tiles';
 import { ProductGrid } from '@/components/vitrine/product-grid';
+import { GoogleReviews } from '@/components/vitrine/google-reviews';
 
 export const revalidate = 60;
 
@@ -21,6 +22,7 @@ export default async function HomePage() {
         <h2 className="font-serif text-3xl mb-6">Récemment ajoutés</h2>
         <ProductGrid products={recent} />
       </section>
+      <GoogleReviews />
     </>
   );
 }
