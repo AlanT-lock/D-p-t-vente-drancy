@@ -48,12 +48,28 @@ export async function deletePhoto(productId: string, position: number): Promise<
 export async function reorderPhotos(productId: string, orderedPositions: number[]): Promise<void> {
   await requireAuth();
   const admin = createAdminClient();
-  // negative temp positions to avoid unique conflict
-  await Promise.all(orderedPositions.map((oldPos, idx) =>
-    admin.from('product_photos').update({ position: -(idx + 1) }).eq('product_id', productId).eq('position', oldPos),
-  ));
-  await Promise.all(orderedPositions.map((_, idx) =>
-    admin.from('product_photos').update({ position: idx }).eq('product_id', productId).eq('position', -(idx + 1)),
-  ));
+
+  // Read current rows to map old position -> storage_path
+  const { data: rows } = await admin
+    .from('product_photos')
+    .select('position, storage_path')
+    .eq('product_id', productId);
+  const byPos = new Map((rows ?? []).map((r) => [r.position, r.storage_path]));
+
+  // Delete current rows
+  await admin.from('product_photos').delete().eq('product_id', productId);
+
+  // Re-insert in new order with positions 0..N-1
+  const toInsert = orderedPositions
+    .map((oldPos, idx) => {
+      const storagePath = byPos.get(oldPos);
+      if (!storagePath) return null;
+      return { product_id: productId, position: idx, storage_path: storagePath };
+    })
+    .filter((x): x is { product_id: string; position: number; storage_path: string } => x !== null);
+
+  if (toInsert.length) {
+    await admin.from('product_photos').insert(toInsert);
+  }
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits/${productId}`);
 }
