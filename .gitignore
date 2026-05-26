@@ -44,3 +44,7 @@ next-env.d.ts
 # superpowers (brainstorming)
 .superpowers/
 
+# playwright
+playwright-report/
+test-results/
+
