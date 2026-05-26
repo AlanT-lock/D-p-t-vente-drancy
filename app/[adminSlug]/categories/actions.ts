@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { slugify } from '@/lib/slugify';
+import { ensureUniqueSlug } from '@/lib/unique-slug';
 
 async function requireAuth() {
   const supabase = await createClient();
@@ -15,14 +16,24 @@ export async function createCategory(formData: FormData): Promise<void> {
   const supabase = await requireAuth();
   const name = String(formData.get('name') ?? '').trim();
   if (!name) return;
-  await supabase.from('categories').insert({ name, slug: slugify(name) });
+  const base = slugify(name);
+  const slug = await ensureUniqueSlug(base, async (s) => {
+    const { count } = await supabase.from('categories').select('*', { count: 'exact', head: true }).eq('slug', s);
+    return (count ?? 0) > 0;
+  });
+  await supabase.from('categories').insert({ name, slug });
   revalidatePath(`/${process.env.ADMIN_SLUG}/categories`);
   revalidatePath('/');
 }
 
 export async function renameCategory(id: string, name: string): Promise<void> {
   const supabase = await requireAuth();
-  await supabase.from('categories').update({ name, slug: slugify(name) }).eq('id', id);
+  const base = slugify(name);
+  const slug = await ensureUniqueSlug(base, async (s) => {
+    const { count } = await supabase.from('categories').select('*', { count: 'exact', head: true }).eq('slug', s).neq('id', id);
+    return (count ?? 0) > 0;
+  });
+  await supabase.from('categories').update({ name, slug }).eq('id', id);
   revalidatePath(`/${process.env.ADMIN_SLUG}/categories`);
   revalidatePath('/');
 }
@@ -38,13 +49,34 @@ export async function deleteCategory(id: string): Promise<void> {
 export async function createSubcategory(categoryId: string, name: string): Promise<void> {
   const supabase = await requireAuth();
   if (!name.trim()) return;
-  await supabase.from('subcategories').insert({ category_id: categoryId, name, slug: slugify(name) });
+  const base = slugify(name);
+  const slug = await ensureUniqueSlug(base, async (s) => {
+    const { count } = await supabase
+      .from('subcategories')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', categoryId)
+      .eq('slug', s);
+    return (count ?? 0) > 0;
+  });
+  await supabase.from('subcategories').insert({ category_id: categoryId, name, slug });
   revalidatePath(`/${process.env.ADMIN_SLUG}/categories/${categoryId}`);
 }
 
 export async function renameSubcategory(id: string, name: string): Promise<void> {
   const supabase = await requireAuth();
-  await supabase.from('subcategories').update({ name, slug: slugify(name) }).eq('id', id);
+  const { data: existing } = await supabase.from('subcategories').select('category_id').eq('id', id).single();
+  if (!existing) return;
+  const base = slugify(name);
+  const slug = await ensureUniqueSlug(base, async (s) => {
+    const { count } = await supabase
+      .from('subcategories')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', existing.category_id)
+      .eq('slug', s)
+      .neq('id', id);
+    return (count ?? 0) > 0;
+  });
+  await supabase.from('subcategories').update({ name, slug }).eq('id', id);
 }
 
 export async function deleteSubcategory(id: string): Promise<void> {
