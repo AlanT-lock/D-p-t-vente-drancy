@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { Header } from './header';
 
 describe('Header', () => {
-  it('affiche le nom du commerce et un bouton appeler sur mobile', () => {
+  it('affiche le logo et un bouton appeler', () => {
     render(<Header />);
-    expect(screen.getByText(/Dépôt Vente/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/Dépôt Vente/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /appeler/i })).toBeInTheDocument();
   });
 });
