@@ -116,24 +116,35 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
             e.preventDefault();
             submitSearch();
           }}
-          className="px-5 py-4 flex items-center gap-2"
+          className="px-4 sm:px-5 py-4 flex items-stretch gap-2"
         >
-          <div className="flex-1 flex items-center gap-2 border border-navy/20 rounded-full px-4 py-2 bg-parchment-light focus-within:border-brass">
+          <div className="flex-1 min-w-0 flex items-center gap-2 border border-navy/20 rounded-full px-3 sm:px-4 py-2 bg-parchment-light focus-within:border-brass">
             <SearchIcon className="size-4 text-bronze shrink-0" />
             <input
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Quel article cherchez-vous ?"
-              className="flex-1 bg-transparent outline-none text-sm"
+              enterKeyHint="search"
+              inputMode="search"
+              autoCapitalize="off"
+              autoCorrect="off"
+              className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
             />
           </div>
           <button
             type="submit"
-            disabled={!query.trim()}
-            className="rounded-full bg-navy text-parchment px-5 py-2 text-sm font-semibold whitespace-nowrap hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={(e) => {
+              // Backup pour s'assurer du déclenchement (certains navigateurs mobiles
+              // ne propagent pas correctement type=submit dans un overlay).
+              e.preventDefault();
+              submitSearch();
+            }}
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy text-parchment px-4 sm:px-5 text-sm font-semibold hover:opacity-90"
+            aria-label="Lancer la recherche"
           >
-            Rechercher
+            <SearchIcon className="size-4 sm:hidden" />
+            <span className="hidden sm:inline">Rechercher</span>
           </button>
         </form>
 
