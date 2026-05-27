@@ -5,8 +5,6 @@ describe('business', () => {
     vi.resetModules();
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://placeholder.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'x';
-    process.env.NEXT_PUBLIC_MEILI_HOST = 'https://x.io';
-    process.env.NEXT_PUBLIC_MEILI_SEARCH_KEY = 'x';
     process.env.NEXT_PUBLIC_BUSINESS_NAME = 'Test';
     process.env.NEXT_PUBLIC_BUSINESS_PHONE = '+33 1 23 45 67 89';
     process.env.NEXT_PUBLIC_BUSINESS_ADDRESS = '1 rue';

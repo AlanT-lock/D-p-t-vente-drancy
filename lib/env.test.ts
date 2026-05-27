@@ -5,8 +5,6 @@ describe('env validation', () => {
     vi.resetModules();
     process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://abc.supabase.co';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'anon';
-    process.env.NEXT_PUBLIC_MEILI_HOST = 'https://meili.cloud';
-    process.env.NEXT_PUBLIC_MEILI_SEARCH_KEY = 'search';
     process.env.ADMIN_SLUG = 'admin-test';
     process.env.NEXT_PUBLIC_BUSINESS_NAME = 'Test';
     process.env.NEXT_PUBLIC_BUSINESS_PHONE = '+33 1 23 45 67 89';
