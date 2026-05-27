@@ -132,20 +132,26 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
               className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
             />
           </div>
-          <button
-            type="submit"
-            onClick={(e) => {
-              // Backup pour s'assurer du déclenchement (certains navigateurs mobiles
-              // ne propagent pas correctement type=submit dans un overlay).
-              e.preventDefault();
-              submitSearch();
-            }}
-            className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy text-parchment px-4 sm:px-5 text-sm font-semibold hover:opacity-90"
-            aria-label="Lancer la recherche"
-          >
-            <SearchIcon className="size-4 sm:hidden" />
-            <span className="hidden sm:inline">Rechercher</span>
-          </button>
+          {query.trim() ? (
+            <Link
+              href={`/recherche?q=${encodeURIComponent(query.trim())}`}
+              onClick={onClose}
+              prefetch={false}
+              className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy text-parchment px-4 sm:px-5 py-2 text-sm font-semibold hover:opacity-90"
+              aria-label="Lancer la recherche"
+            >
+              <SearchIcon className="size-4 sm:hidden" />
+              <span className="hidden sm:inline">Rechercher</span>
+            </Link>
+          ) : (
+            <span
+              className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy/40 text-parchment px-4 sm:px-5 py-2 text-sm font-semibold cursor-not-allowed select-none"
+              aria-disabled="true"
+            >
+              <SearchIcon className="size-4 sm:hidden" />
+              <span className="hidden sm:inline">Rechercher</span>
+            </span>
+          )}
         </form>
 
         <div className="px-3 pb-4 max-h-[min(60vh,500px)] overflow-y-auto">
