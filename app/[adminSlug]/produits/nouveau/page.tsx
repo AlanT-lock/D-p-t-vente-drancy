@@ -9,7 +9,10 @@ export default async function NewProductPage() {
   const { data: cats } = await supabase.from('categories').select('*, subcategories(*)').order('position');
   return (
     <div>
-      <h1 className="font-serif text-3xl mb-6">Nouveau produit</h1>
+      <h1 className="font-serif text-3xl mb-2">Nouveau produit</h1>
+      <p className="text-sm text-bronze mb-6">
+        Renseigne les infos puis enregistre — tu pourras ajouter les photos à l'étape suivante.
+      </p>
       <ProductForm action={createProduct} categories={(cats as unknown as Cat[]) ?? []} submitLabel="Enregistrer" />
     </div>
   );
