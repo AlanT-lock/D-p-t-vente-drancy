@@ -130,6 +130,25 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
           </button>
         </form>
 
+        {/* DIAGNOSTIC TEMPORAIRE — sera retiré dès qu'on confirme que le tap marche */}
+        <div className="px-4 sm:px-5 pb-3 flex flex-col gap-2">
+          <a
+            href="/recherche?q=test"
+            className="block text-center bg-red-600 text-white font-bold py-3 rounded-lg"
+          >
+            TEST A — lien direct /recherche?q=test
+          </a>
+          <a
+            href="/categories"
+            className="block text-center bg-orange-500 text-white font-bold py-3 rounded-lg"
+          >
+            TEST B — lien direct /categories
+          </a>
+          <p className="text-[10px] text-bronze text-center">
+            Build : 2026-05-27 search v8
+          </p>
+        </div>
+
         <div className="px-3 pb-4 max-h-[min(60vh,500px)] overflow-y-auto">
           {loading && <p className="text-xs text-bronze py-2 px-2">Recherche…</p>}
           {!loading && query.trim() && results.length === 0 && (
