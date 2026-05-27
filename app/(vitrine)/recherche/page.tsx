@@ -1,75 +1,77 @@
-'use client';
-import { InstantSearchProvider } from '@/components/vitrine/instantsearch-provider';
-import { SearchBox, Hits, RefinementList, RangeInput, SortBy, ClearRefinements, CurrentRefinements } from 'react-instantsearch';
 import Link from 'next/link';
 import Image from 'next/image';
+import { searchProducts } from '@/lib/search/products';
 import { formatPrice } from '@/lib/format';
+import { conditionLabel, type Condition } from '@/lib/condition';
+import { publicEnv } from '@/lib/env';
+import { SearchForm } from '@/components/vitrine/search-form';
 
-type Hit = {
-  objectID: string;
-  slug: string;
-  name: string;
-  subcategory_name: string;
-  price_cents: number;
-  main_photo_url: string | null;
+export const dynamic = 'force-dynamic';
+
+type Search = {
+  q?: string;
+  categorie?: string;
+  sousCategorie?: string;
+  conditions?: string;
+  maxPrice?: string;
+  available?: string;
+  sort?: string;
 };
 
-function HitItem({ hit }: { hit: Hit }) {
-  return (
-    <Link href={`/produit/${hit.slug}`} className="block bg-parchment-light rounded-lg border border-navy/10 overflow-hidden">
-      <div className="relative aspect-square">
-        {hit.main_photo_url && <Image src={hit.main_photo_url} alt={hit.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />}
-      </div>
-      <div className="p-3">
-        <div className="text-xs text-bronze uppercase tracking-wider">{hit.subcategory_name}</div>
-        <h3 className="font-serif text-base mt-1">{hit.name}</h3>
-        <p className="font-semibold mt-1">{formatPrice(hit.price_cents)}</p>
-      </div>
-    </Link>
-  );
-}
+export default async function RecherchePage({ searchParams }: { searchParams: Promise<Search> }) {
+  const sp = await searchParams;
+  const q = sp.q ?? '';
+  const conditions = sp.conditions?.split(',').filter(Boolean);
+  const maxPrice = sp.maxPrice ? Number(sp.maxPrice) * 100 : undefined;
 
-export default function RecherchePage() {
+  const results = q || sp.categorie || sp.sousCategorie || conditions?.length || maxPrice || sp.available
+    ? await searchProducts(q, {
+        categorySlug: sp.categorie,
+        subcategorySlug: sp.sousCategorie,
+        conditions,
+        maxPriceCents: maxPrice,
+        availableOnly: sp.available === '1',
+        sort: (sp.sort as 'relevance' | 'price_asc' | 'price_desc' | 'recent') ?? 'relevance',
+        limit: 60,
+      })
+    : [];
+
+  const photoUrl = (path: string) =>
+    `${publicEnv.SUPABASE_URL}/storage/v1/object/public/product-photos/${path}`;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <InstantSearchProvider>
-        <SearchBox placeholder="Rechercher…" classNames={{ input: 'w-full rounded-full border border-navy/20 px-4 py-2' }} />
-        <div className="grid md:grid-cols-[220px_1fr] gap-8 mt-6">
-          <aside className="space-y-6 text-sm">
-            <div>
-              <h3 className="font-serif uppercase tracking-wider text-bronze text-xs mb-2">Catégorie</h3>
-              <RefinementList attribute="category_name" />
-            </div>
-            <div>
-              <h3 className="font-serif uppercase tracking-wider text-bronze text-xs mb-2">Sous-catégorie</h3>
-              <RefinementList attribute="subcategory_name" />
-            </div>
-            <div>
-              <h3 className="font-serif uppercase tracking-wider text-bronze text-xs mb-2">État</h3>
-              <RefinementList attribute="condition" />
-            </div>
-            <div>
-              <h3 className="font-serif uppercase tracking-wider text-bronze text-xs mb-2">Prix (cts)</h3>
-              <RangeInput attribute="price_cents" />
-            </div>
-            <ClearRefinements />
-          </aside>
-          <div>
-            <div className="flex justify-between items-center mb-4">
-              <CurrentRefinements />
-              <SortBy
-                items={[
-                  { value: 'products', label: 'Pertinence' },
-                  { value: 'products:price_cents:asc', label: 'Prix ↑' },
-                  { value: 'products:price_cents:desc', label: 'Prix ↓' },
-                  { value: 'products:created_at_ts:desc', label: 'Récents' },
-                ]}
-              />
-            </div>
-            <Hits<Hit> hitComponent={HitItem} classNames={{ list: 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4' }} />
-          </div>
-        </div>
-      </InstantSearchProvider>
+      <SearchForm
+        initialQuery={q}
+        initialMaxPrice={sp.maxPrice ?? ''}
+        initialAvailable={sp.available === '1'}
+        initialConditions={conditions ?? []}
+        initialSort={sp.sort ?? 'relevance'}
+      />
+
+      <p className="text-sm text-bronze mt-6">
+        {q ? `${results.length} résultat${results.length > 1 ? 's' : ''} pour "${q}"` : `${results.length} produit${results.length > 1 ? 's' : ''}`}
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+        {results.map((p) => {
+          const main = [...p.photos].sort((a, b) => a.position - b.position)[0];
+          return (
+            <Link key={p.id} href={`/produit/${p.slug}`} className="block bg-parchment-light rounded-lg border border-navy/10 overflow-hidden">
+              <div className="relative aspect-square">
+                {main && (
+                  <Image src={photoUrl(main.storage_path)} alt={p.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
+                )}
+              </div>
+              <div className="p-3">
+                <div className="text-xs text-bronze uppercase tracking-wider">{p.subcategory_name} · {conditionLabel(p.condition as Condition)}</div>
+                <h3 className="font-serif text-base mt-1">{p.name}</h3>
+                <p className="font-semibold mt-1">{formatPrice(p.price_cents)}</p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
