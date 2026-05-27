@@ -7,10 +7,6 @@ import { SearchTrigger } from './search-trigger';
 export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-parchment/90 backdrop-blur border-b border-navy/10">
-      {/* DIAG TEMP */}
-      <div className="bg-red-600 text-white text-center text-xs py-1 font-bold">
-        BUILD v8 — 2026-05-27 — si tu vois ce bandeau, tu as le bon code
-      </div>
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
         <Link href="/" className="flex items-center shrink-0" aria-label={business.name}>
           <Image
