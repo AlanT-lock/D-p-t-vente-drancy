@@ -93,3 +93,17 @@ export async function deleteProduct(id: string): Promise<void> {
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
   redirect(`/${process.env.ADMIN_SLUG}/produits`);
 }
+
+export async function deleteProductFromList(id: string): Promise<void> {
+  const supabase = await requireAuth();
+  await supabase.from('products').delete().eq('id', id);
+  revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+}
+
+export async function setProductQuantity(id: string, formData: FormData): Promise<void> {
+  const supabase = await requireAuth();
+  const q = Number(formData.get('quantity'));
+  if (!Number.isInteger(q) || q < 0) return;
+  await supabase.from('products').update({ quantity: q }).eq('id', id);
+  revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+}
