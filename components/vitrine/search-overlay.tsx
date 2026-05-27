@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { X, Search as SearchIcon } from 'lucide-react';
@@ -19,10 +19,22 @@ type Hit = {
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Hit[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Ferme automatiquement quand l'URL change (après navigation par lien/form)
+  const lastKeyRef = useRef(`${pathname}?${searchParams.toString()}`);
+  useEffect(() => {
+    const key = `${pathname}?${searchParams.toString()}`;
+    if (open && key !== lastKeyRef.current) {
+      onClose();
+    }
+    lastKeyRef.current = key;
+  }, [pathname, searchParams, open, onClose]);
 
   // Reset + focus on open
   useEffect(() => {
@@ -83,8 +95,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const submitSearch = () => {
     const trimmed = query.trim();
     if (!trimmed) return;
-    onClose();
     router.push(`/recherche?q=${encodeURIComponent(trimmed)}`);
+    // onClose() est appelé par l'effect sur changement d'URL
   };
 
   return (
@@ -132,26 +144,21 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
               className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
             />
           </div>
-          {query.trim() ? (
-            <Link
-              href={`/recherche?q=${encodeURIComponent(query.trim())}`}
-              onClick={onClose}
-              prefetch={false}
-              className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy text-parchment px-4 sm:px-5 py-2 text-sm font-semibold hover:opacity-90"
-              aria-label="Lancer la recherche"
-            >
-              <SearchIcon className="size-4 sm:hidden" />
-              <span className="hidden sm:inline">Rechercher</span>
-            </Link>
-          ) : (
-            <span
-              className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy/40 text-parchment px-4 sm:px-5 py-2 text-sm font-semibold cursor-not-allowed select-none"
-              aria-disabled="true"
-            >
-              <SearchIcon className="size-4 sm:hidden" />
-              <span className="hidden sm:inline">Rechercher</span>
-            </span>
-          )}
+          <Link
+            href={query.trim() ? `/recherche?q=${encodeURIComponent(query.trim())}` : '#'}
+            aria-disabled={!query.trim()}
+            tabIndex={query.trim() ? 0 : -1}
+            onClick={(e) => {
+              if (!query.trim()) e.preventDefault();
+            }}
+            className={`shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full text-parchment px-4 sm:px-5 py-2 text-sm font-semibold ${
+              query.trim() ? 'bg-navy hover:opacity-90' : 'bg-navy/40 cursor-not-allowed pointer-events-none'
+            }`}
+            aria-label="Lancer la recherche"
+          >
+            <SearchIcon className="size-4 sm:hidden" />
+            <span className="hidden sm:inline">Rechercher</span>
+          </Link>
         </form>
 
         <div className="px-3 pb-4 max-h-[min(60vh,500px)] overflow-y-auto">
