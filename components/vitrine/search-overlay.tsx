@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import Image from 'next/image';
 import { X, Search as SearchIcon } from 'lucide-react';
 import { formatPrice } from '@/lib/format';
@@ -18,25 +16,12 @@ type Hit = {
 };
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Hit[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  // Ferme automatiquement quand l'URL change (après navigation par lien/form)
-  const lastKeyRef = useRef(`${pathname}?${searchParams.toString()}`);
-  useEffect(() => {
-    const key = `${pathname}?${searchParams.toString()}`;
-    if (open && key !== lastKeyRef.current) {
-      onClose();
-    }
-    lastKeyRef.current = key;
-  }, [pathname, searchParams, open, onClose]);
-
-  // Reset + focus on open
   useEffect(() => {
     if (open) {
       setQuery('');
@@ -46,7 +31,6 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     }
   }, [open]);
 
-  // Lock body scroll while overlay open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -56,7 +40,6 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     };
   }, [open]);
 
-  // Esc to close
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -66,7 +49,6 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     return () => document.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  // Debounced live results
   useEffect(() => {
     if (!open) return;
     const trimmed = query.trim();
@@ -92,48 +74,42 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const photoUrl = (path: string) =>
     `${publicEnv.SUPABASE_URL}/storage/v1/object/public/product-photos/${path}`;
 
-  const submitSearch = () => {
-    const trimmed = query.trim();
-    if (!trimmed) return;
-    router.push(`/recherche?q=${encodeURIComponent(trimmed)}`);
-    // onClose() est appelé par l'effect sur changement d'URL
-  };
-
   return (
     <div
       className="fixed inset-0 z-50 bg-navy/40 backdrop-blur-sm flex items-start justify-center px-4 pt-16 md:pt-24"
-      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Recherche"
+      onClick={(e) => {
+        // Ferme uniquement si on clique vraiment sur le backdrop (pas un enfant)
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl bg-parchment rounded-2xl shadow-2xl border border-navy/10 overflow-hidden"
-      >
+      <div className="w-full max-w-2xl bg-parchment rounded-2xl shadow-2xl border border-navy/10 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3 border-b border-navy/10">
           <span className="font-serif text-sm uppercase tracking-wider text-bronze">Recherche</span>
           <button
             type="button"
             onClick={onClose}
-            className="text-bronze hover:text-navy"
+            className="text-bronze hover:text-navy p-1"
             aria-label="Fermer la recherche"
           >
             <X className="size-5" />
           </button>
         </div>
 
+        {/* Form GET natif — submit du navigateur direct vers /recherche */}
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            submitSearch();
-          }}
+          ref={formRef}
+          action="/recherche"
+          method="get"
           className="px-4 sm:px-5 py-4 flex items-stretch gap-2"
         >
           <div className="flex-1 min-w-0 flex items-center gap-2 border border-navy/20 rounded-full px-3 sm:px-4 py-2 bg-parchment-light focus-within:border-brass">
             <SearchIcon className="size-4 text-bronze shrink-0" />
             <input
               ref={inputRef}
+              name="q"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Quel article cherchez-vous ?"
@@ -144,21 +120,14 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
               className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
             />
           </div>
-          <Link
-            href={query.trim() ? `/recherche?q=${encodeURIComponent(query.trim())}` : '#'}
-            aria-disabled={!query.trim()}
-            tabIndex={query.trim() ? 0 : -1}
-            onClick={(e) => {
-              if (!query.trim()) e.preventDefault();
-            }}
-            className={`shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full text-parchment px-4 sm:px-5 py-2 text-sm font-semibold ${
-              query.trim() ? 'bg-navy hover:opacity-90' : 'bg-navy/40 cursor-not-allowed pointer-events-none'
-            }`}
+          <button
+            type="submit"
+            className="shrink-0 inline-flex items-center justify-center gap-1.5 rounded-full bg-navy text-parchment px-4 sm:px-5 py-2 text-sm font-semibold active:opacity-80 hover:opacity-90"
             aria-label="Lancer la recherche"
           >
             <SearchIcon className="size-4 sm:hidden" />
             <span className="hidden sm:inline">Rechercher</span>
-          </Link>
+          </button>
         </form>
 
         <div className="px-3 pb-4 max-h-[min(60vh,500px)] overflow-y-auto">
@@ -174,9 +143,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
           <ul className="space-y-0.5">
             {results.map((hit) => (
               <li key={hit.id}>
-                <Link
+                <a
                   href={`/produit/${hit.slug}`}
-                  onClick={onClose}
                   className="flex items-center gap-3 p-2 hover:bg-parchment-light rounded"
                 >
                   <div className="relative w-12 h-12 bg-parchment-light rounded overflow-hidden shrink-0">
@@ -196,14 +164,14 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                       {hit.subcategory_name} · {formatPrice(hit.price_cents)}
                     </div>
                   </div>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
           {results.length > 0 && (
             <button
               type="button"
-              onClick={submitSearch}
+              onClick={() => formRef.current?.submit()}
               className="block w-full text-center text-xs underline text-bronze py-3 hover:text-navy"
             >
               Voir tous les résultats →
