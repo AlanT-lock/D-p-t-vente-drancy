@@ -7,9 +7,12 @@ export function CategoryTiles({ categories }: { categories: CategoryWithSubs[] }
       <h2 className="font-serif text-3xl mb-6">Catégories</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {categories.map((c) => (
-          <Link key={c.id} href={`/c/${c.slug}`} className="block bg-parchment-light rounded-lg p-6 border border-navy/10 hover:border-brass transition">
+          <Link
+            key={c.id}
+            href={`/c/${c.slug}`}
+            className="flex items-center justify-center bg-parchment-light rounded-lg p-6 aspect-square border border-navy/10 hover:border-brass transition text-center"
+          >
             <h3 className="font-serif text-xl">{c.name}</h3>
-            <p className="text-xs text-bronze mt-2">{c.subcategories.length} sous-catégorie{c.subcategories.length > 1 ? 's' : ''}</p>
           </Link>
         ))}
       </div>
