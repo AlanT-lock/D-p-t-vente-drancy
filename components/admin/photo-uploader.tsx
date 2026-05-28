@@ -110,26 +110,20 @@ export function PhotoUploader({
                   <Star className="size-2.5 fill-navy" /> Principale
                 </span>
               )}
-              <form
-                action={() => {
+              <button
+                type="button"
+                onClick={() => {
+                  if (!confirm('Supprimer cette photo ?')) return;
                   startTransition(async () => {
                     await deletePhoto(productId, p.position);
                   });
                 }}
-                onSubmit={(e) => {
-                  if (!confirm('Supprimer cette photo ?')) e.preventDefault();
-                }}
-                className="absolute top-1 right-1"
+                className="absolute top-1 right-1 bg-navy/85 text-parchment rounded-full size-6 inline-flex items-center justify-center hover:bg-red-700"
+                aria-label="Supprimer cette photo"
+                title="Supprimer"
               >
-                <button
-                  type="submit"
-                  className="bg-navy/85 text-parchment rounded-full size-6 inline-flex items-center justify-center hover:bg-red-700"
-                  aria-label="Supprimer cette photo"
-                  title="Supprimer"
-                >
-                  <X className="size-3.5" />
-                </button>
-              </form>
+                <X className="size-3.5" />
+              </button>
             </div>
           ))}
         </div>

@@ -77,28 +77,21 @@ export function ProductRow({
         </button>
       </form>
 
-      <form
-        action={() => {
+      <button
+        type="button"
+        disabled={pending}
+        onClick={() => {
+          if (!confirm(`Supprimer définitivement « ${product.name} » ?`)) return;
           startTransition(async () => {
             await deleteAction();
           });
         }}
-        onSubmit={(e) => {
-          if (!confirm(`Supprimer définitivement « ${product.name} » ?`)) {
-            e.preventDefault();
-          }
-        }}
+        className="rounded border border-red-700/40 text-red-700 p-1.5 hover:bg-red-700/10 disabled:opacity-50"
+        aria-label="Supprimer"
+        title="Supprimer"
       >
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded border border-red-700/40 text-red-700 p-1.5 hover:bg-red-700/10 disabled:opacity-50"
-          aria-label="Supprimer"
-          title="Supprimer"
-        >
-          <Trash2 className="size-3.5" />
-        </button>
-      </form>
+        <Trash2 className="size-3.5" />
+      </button>
     </li>
   );
 }
