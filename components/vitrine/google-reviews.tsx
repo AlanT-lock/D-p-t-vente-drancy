@@ -32,23 +32,29 @@ export async function GoogleReviews() {
           </div>
         )}
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
         {list.map((r) => (
-          <article key={r.id} className="bg-parchment-light rounded-lg p-4 border border-navy/10">
+          <article
+            key={r.id}
+            className="snap-start shrink-0 w-[85%] sm:w-[360px] bg-parchment-light rounded-lg p-4 border border-navy/10 flex flex-col"
+          >
             <div className="flex items-center gap-2 mb-2">
               {r.profile_photo && (
-                <div className="relative size-8 rounded-full overflow-hidden bg-bronze/10">
+                <div className="relative size-8 rounded-full overflow-hidden bg-bronze/10 shrink-0">
                   <Image src={r.profile_photo} alt="" fill className="object-cover" sizes="32px" />
                 </div>
               )}
-              <div>
-                <div className="font-serif text-sm">{r.author_name}</div>
+              <div className="min-w-0">
+                <div className="font-serif text-sm truncate">{r.author_name}</div>
                 <div className="text-[10px] text-bronze">{r.relative_time}</div>
               </div>
             </div>
             <div className="flex gap-0.5 mb-2">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={`size-3.5 ${i < (r.rating ?? 0) ? 'fill-brass text-brass' : 'text-bronze/30'}`} />
+                <Star
+                  key={i}
+                  className={`size-3.5 ${i < (r.rating ?? 0) ? 'fill-brass text-brass' : 'text-bronze/30'}`}
+                />
               ))}
             </div>
             <p className="text-sm leading-relaxed line-clamp-6">{r.text}</p>
