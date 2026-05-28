@@ -4,7 +4,7 @@ export function Hero() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
       <div className="text-xs uppercase tracking-[2px] text-bronze font-semibold">
-        Brocante · Dépôt-vente · Drancy
+        Dépôt-vente · Drancy
       </div>
       <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mt-3 max-w-3xl">
         Des trouvailles <em className="text-brass not-italic font-light italic">uniques</em><br />
