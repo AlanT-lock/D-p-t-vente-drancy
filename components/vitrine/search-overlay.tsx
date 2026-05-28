@@ -76,7 +76,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-navy/40 backdrop-blur-sm flex items-start justify-center px-4 pt-16 md:pt-24"
+      className="fixed inset-0 z-[60] bg-navy/50 backdrop-blur-lg flex items-start justify-center px-4 pt-16 md:pt-24"
       role="dialog"
       aria-modal="true"
       aria-label="Recherche"
