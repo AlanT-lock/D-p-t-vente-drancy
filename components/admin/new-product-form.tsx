@@ -74,12 +74,23 @@ export function NewProductForm({
         return;
       }
       // Upload séquentiel des photos contre le nouveau product id
-      for (const photo of photos) {
+      const failures: string[] = [];
+      for (let i = 0; i < photos.length; i++) {
         try {
-          await addPhotoAction(result.id, photo.dataUrl);
+          await addPhotoAction(result.id, photos[i].dataUrl);
         } catch (e) {
-          console.error('Upload photo échoué', e);
+          const msg = e instanceof Error ? e.message : String(e);
+          failures.push(`photo ${i + 1} : ${msg}`);
         }
+      }
+      if (failures.length) {
+        // Produit créé mais les photos ont raté : reste sur le form pour informer
+        setError(
+          `Produit créé sans photo. Échec(s) : ${failures.join(' · ')}. Va sur l'édition pour réessayer.`,
+        );
+        // On redirige quand même pour que l'admin puisse continuer
+        setTimeout(() => router.push(`/${adminSlug}/produits/${result.id}`), 4000);
+        return;
       }
       router.push(`/${adminSlug}/produits/${result.id}`);
     });
