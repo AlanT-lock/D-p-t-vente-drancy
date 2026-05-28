@@ -17,11 +17,11 @@ export default async function HomePage() {
     <>
       <StoreBanner />
       <Hero />
-      <CategoryTiles categories={categories} />
       <section className="mx-auto max-w-7xl px-4 py-12">
         <h2 className="font-serif text-3xl mb-6">Récemment ajoutés</h2>
         <ProductGrid products={recent} />
       </section>
+      <CategoryTiles categories={categories} />
       <GoogleReviews />
     </>
   );
