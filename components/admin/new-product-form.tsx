@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import imageCompression from 'browser-image-compression';
 import { ImagePlus, Loader2, X } from 'lucide-react';
 import { CONDITIONS } from '@/lib/condition';
+import { uid } from '@/lib/uid';
 
 type Sub = { id: string; name: string; category_id: string };
 type Cat = { id: string; name: string; subcategories: Sub[] };
@@ -46,7 +47,7 @@ export function NewProductForm({
           useWebWorker: true,
         });
         const dataUrl = await imageCompression.getDataUrlFromFile(compressed);
-        setPhotos((prev) => [...prev, { id: crypto.randomUUID(), dataUrl }]);
+        setPhotos((prev) => [...prev, { id: uid(), dataUrl }]);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Compression échouée');
