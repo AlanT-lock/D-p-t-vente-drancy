@@ -32,7 +32,7 @@ export async function GoogleReviews() {
           </div>
         )}
       </div>
-      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 pl-1 pr-4 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
         {list.map((r) => (
           <article
             key={r.id}
