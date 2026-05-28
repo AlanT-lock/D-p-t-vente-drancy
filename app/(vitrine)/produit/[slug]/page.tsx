@@ -46,8 +46,15 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <p className="text-xs uppercase tracking-wider text-bronze">{sub.name} · {conditionLabel(product.condition as Condition)}</p>
           <h1 className="font-serif text-4xl mt-2">{product.name}</h1>
           <p className="text-2xl font-semibold mt-3">{formatPrice(product.price_cents)}</p>
-          {product.quantity === 1 && <p className="text-sm text-brass mt-1">Pièce unique</p>}
-          {product.quantity === 0 && <p className="text-sm text-red-700 mt-1">Plus disponible</p>}
+          {product.quantity === 0 ? (
+            <p className="text-sm text-red-700 mt-1 font-semibold">Plus disponible</p>
+          ) : product.quantity === 1 ? (
+            <p className="text-sm text-brass mt-1 font-semibold">Pièce unique · 1 disponible</p>
+          ) : (
+            <p className="text-sm text-bronze mt-1">
+              {product.quantity} exemplaires disponibles
+            </p>
+          )}
           {product.description && (
             <div className="mt-6 text-sm leading-relaxed whitespace-pre-wrap">{product.description}</div>
           )}
