@@ -12,7 +12,7 @@ type Row = {
   condition: Condition;
   is_published: boolean;
   created_at: string;
-  subcategory_id: string;
+  subcategory_id: string | null;
   photos: { storage_path: string; position: number }[];
 };
 type Sub = { id: string; name: string; category_id: string; position: number };
@@ -46,7 +46,7 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
   const grouped = new Map<string, Row[]>();
   const orphans: Row[] = [];
   for (const p of products) {
-    const catId = subToCat.get(p.subcategory_id);
+    const catId = p.subcategory_id ? subToCat.get(p.subcategory_id) : undefined;
     if (catId) {
       const list = grouped.get(catId) ?? [];
       list.push(p);
