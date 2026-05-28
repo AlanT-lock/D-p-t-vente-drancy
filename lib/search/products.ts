@@ -10,6 +10,8 @@ export type SearchOpts = {
   availableOnly?: boolean;
   sort?: 'relevance' | 'price_asc' | 'price_desc' | 'recent';
   limit?: number;
+  /** Inclure les produits non-publiés (réservé à l'admin) */
+  includeUnpublished?: boolean;
 };
 
 export type SearchResult = ProductWithPhotos & {
@@ -29,8 +31,10 @@ export async function searchProducts(query: string, opts: SearchOpts = {}): Prom
       *,
       photos:product_photos(*),
       subcategory:subcategories!inner(slug, name, category:categories!inner(slug, name))
-    `)
-    .eq('is_published', true);
+    `);
+  if (!opts.includeUnpublished) {
+    q = q.eq('is_published', true);
+  }
 
   if (opts.subcategorySlug) {
     q = q.eq('subcategory.slug', opts.subcategorySlug);
