@@ -2,10 +2,11 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import imageCompression from 'browser-image-compression';
-import { ImagePlus, Loader2, X } from 'lucide-react';
+import { ImagePlus, Loader2, X, Camera } from 'lucide-react';
 import { CONDITIONS } from '@/lib/condition';
 import { uid } from '@/lib/uid';
+import { compressToWebpDataUrl, dataUrlToFile } from '@/lib/image';
+import { CameraCapture } from './camera-capture';
 
 type Sub = { id: string; name: string; category_id: string };
 type Cat = { id: string; name: string; subcategories: Sub[] };
@@ -30,23 +31,18 @@ export function NewProductForm({
   const [compressing, setCompressing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, startTransition] = useTransition();
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   const subs = categories.find((c) => c.id === categoryId)?.subcategories ?? [];
   const remaining = MAX_PHOTOS - photos.length;
 
-  const handleFiles = async (files: FileList) => {
+  const ingestFiles = async (files: File[]) => {
     setError(null);
     setCompressing(true);
     try {
-      const list = Array.from(files).slice(0, remaining);
+      const list = files.slice(0, Math.max(0, MAX_PHOTOS - photos.length));
       for (const file of list) {
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1600,
-          fileType: 'image/webp',
-          useWebWorker: true,
-        });
-        const dataUrl = await imageCompression.getDataUrlFromFile(compressed);
+        const dataUrl = await compressToWebpDataUrl(file);
         setPhotos((prev) => [...prev, { id: uid(), dataUrl }]);
       }
     } catch (e) {
@@ -54,6 +50,17 @@ export function NewProductForm({
     } finally {
       setCompressing(false);
     }
+  };
+
+  const handleFiles = (files: FileList) => ingestFiles(Array.from(files));
+
+  const handleCameraDone = async (dataUrls: string[]) => {
+    setCameraOpen(false);
+    if (dataUrls.length === 0) return;
+    const files = await Promise.all(
+      dataUrls.map((u, i) => dataUrlToFile(u, `camera-${Date.now()}-${i}.jpg`)),
+    );
+    await ingestFiles(files);
   };
 
   const removePhoto = (id: string) => setPhotos((prev) => prev.filter((p) => p.id !== id));
@@ -79,6 +86,10 @@ export function NewProductForm({
   };
 
   return (
+    <>
+      {cameraOpen && (
+        <CameraCapture onCapture={handleCameraDone} onClose={() => setCameraOpen(false)} />
+      )}
     <form action={handleSubmit} className="space-y-4 pb-24">
       {/* Photos section */}
       <section className="bg-parchment-light border border-navy/10 rounded-lg p-4">
@@ -88,35 +99,49 @@ export function NewProductForm({
         </div>
 
         {photos.length < MAX_PHOTOS && (
-          <label className="flex items-center justify-center gap-2 w-full cursor-pointer rounded-lg border-2 border-dashed border-brass bg-parchment hover:bg-brass/10 px-4 py-5 text-navy font-medium transition">
-            {compressing ? (
-              <>
-                <Loader2 className="size-5 animate-spin" />
-                <span>Préparation…</span>
-              </>
-            ) : (
-              <>
-                <ImagePlus className="size-5" />
-                <span>
-                  {photos.length === 0
-                    ? `Ajouter des photos (jusqu'à ${MAX_PHOTOS})`
-                    : `Ajouter ${remaining === 1 ? 'une photo' : `${remaining} photos de plus`}`}
-                </span>
-              </>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files?.length) {
-                  handleFiles(e.target.files);
-                  e.target.value = '';
-                }
-              }}
-            />
-          </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setCameraOpen(true)}
+              disabled={compressing}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brass bg-parchment hover:bg-brass/10 px-3 py-4 text-navy font-medium transition disabled:opacity-50"
+            >
+              <Camera className="size-5" />
+              <span className="text-sm">Appareil photo</span>
+            </button>
+            <label className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brass bg-parchment hover:bg-brass/10 px-3 py-4 text-navy font-medium transition cursor-pointer">
+              {compressing ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" />
+                  <span className="text-sm">Préparation…</span>
+                </>
+              ) : (
+                <>
+                  <ImagePlus className="size-5" />
+                  <span className="text-sm">Galerie</span>
+                </>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.length) {
+                    handleFiles(e.target.files);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </label>
+          </div>
+        )}
+        {photos.length < MAX_PHOTOS && (
+          <p className="text-[11px] text-bronze mt-2 text-center">
+            {remaining === MAX_PHOTOS
+              ? `Jusqu'à ${MAX_PHOTOS} photos`
+              : `Encore ${remaining} photo${remaining > 1 ? 's' : ''} possible${remaining > 1 ? 's' : ''}`}
+          </p>
         )}
 
         {photos.length > 0 && (
@@ -256,6 +281,7 @@ export function NewProductForm({
         </button>
       </div>
     </form>
+    </>
   );
 }
 

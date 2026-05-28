@@ -2,10 +2,13 @@
 
 import { useState, useTransition } from 'react';
 import Image from 'next/image';
-import imageCompression from 'browser-image-compression';
-import { ImagePlus, Loader2, X, Star } from 'lucide-react';
+import { ImagePlus, Loader2, X, Star, Camera } from 'lucide-react';
 import { publicEnv } from '@/lib/env';
 import { addPhoto, deletePhoto } from '@/app/[adminSlug]/produits/photo-actions';
+import { compressToWebpDataUrl, dataUrlToFile } from '@/lib/image';
+import { CameraCapture } from './camera-capture';
+
+const MAX_PHOTOS = 5;
 
 export function PhotoUploader({
   productId,
@@ -14,30 +17,23 @@ export function PhotoUploader({
   productId: string;
   initial: { position: number; storage_path: string }[];
 }) {
-  const [pending, setPending] = useState(0); // nombre de photos en cours d'upload
+  const [pending, setPending] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [, startTransition] = useTransition();
 
   const url = (p: string) =>
     `${publicEnv.SUPABASE_URL}/storage/v1/object/public/product-photos/${p}`;
   const sorted = [...initial].sort((a, b) => a.position - b.position);
-  const remainingSlots = Math.max(0, 5 - sorted.length);
+  const remainingSlots = Math.max(0, MAX_PHOTOS - sorted.length);
 
-  const handleFiles = async (files: FileList) => {
+  const uploadFiles = async (files: File[]) => {
     setError(null);
-    const list = Array.from(files).slice(0, remainingSlots);
-    if (list.length === 0) return;
-
+    const list = files.slice(0, remainingSlots);
     for (const file of list) {
       setPending((n) => n + 1);
       try {
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1600,
-          fileType: 'image/webp',
-          useWebWorker: true,
-        });
-        const dataUrl = await imageCompression.getDataUrlFromFile(compressed);
+        const dataUrl = await compressToWebpDataUrl(file);
         await addPhoto(productId, dataUrl);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Upload échoué');
@@ -47,13 +43,28 @@ export function PhotoUploader({
     }
   };
 
+  const handleGalleryFiles = (files: FileList) => uploadFiles(Array.from(files));
+
+  const handleCameraDone = async (dataUrls: string[]) => {
+    setCameraOpen(false);
+    if (dataUrls.length === 0) return;
+    const files = await Promise.all(
+      dataUrls.map((u, i) => dataUrlToFile(u, `camera-${Date.now()}-${i}.jpg`)),
+    );
+    await uploadFiles(files);
+  };
+
   return (
     <div>
-      {/* Compteur + état */}
+      {cameraOpen && (
+        <CameraCapture onCapture={handleCameraDone} onClose={() => setCameraOpen(false)} />
+      )}
+
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs text-bronze">
-          {sorted.length} / 5 photo{sorted.length > 1 ? 's' : ''}
-          {sorted.length === 0 && ' — ajoute au moins une photo pour que le produit s\'affiche sur le site'}
+          {sorted.length} / {MAX_PHOTOS} photo{sorted.length > 1 ? 's' : ''}
+          {sorted.length === 0 &&
+            " — ajoute au moins une photo pour que le produit s'affiche sur le site"}
         </p>
         {pending > 0 && (
           <p className="text-xs text-bronze inline-flex items-center gap-1">
@@ -62,35 +73,38 @@ export function PhotoUploader({
         )}
       </div>
 
-      {/* Bouton principal d'ajout */}
       {remainingSlots > 0 && (
-        <label className="flex items-center justify-center gap-2 w-full cursor-pointer rounded-lg border-2 border-dashed border-brass bg-parchment-light hover:bg-brass/10 px-4 py-6 text-navy font-medium transition">
-          <ImagePlus className="size-5" />
-          <span>
-            {sorted.length === 0
-              ? 'Ajouter des photos (jusqu\'à 5)'
-              : `Ajouter ${remainingSlots === 1 ? 'une photo' : `${remainingSlots} photos de plus`}`}
-          </span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              if (e.target.files?.length) {
-                handleFiles(e.target.files);
-                e.target.value = '';
-              }
-            }}
-          />
-        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setCameraOpen(true)}
+            disabled={pending > 0}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brass bg-parchment-light hover:bg-brass/10 px-3 py-4 text-navy font-medium transition disabled:opacity-50"
+          >
+            <Camera className="size-5" />
+            <span className="text-sm">Appareil photo</span>
+          </button>
+          <label className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-brass bg-parchment-light hover:bg-brass/10 px-3 py-4 text-navy font-medium transition cursor-pointer">
+            <ImagePlus className="size-5" />
+            <span className="text-sm">Galerie</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files?.length) {
+                  handleGalleryFiles(e.target.files);
+                  e.target.value = '';
+                }
+              }}
+            />
+          </label>
+        </div>
       )}
 
-      {error && (
-        <p className="text-xs text-red-700 mt-2">⚠ {error}</p>
-      )}
+      {error && <p className="text-xs text-red-700 mt-2">⚠ {error}</p>}
 
-      {/* Grille des photos existantes */}
       {sorted.length > 0 && (
         <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4">
           {sorted.map((p) => (
@@ -129,9 +143,9 @@ export function PhotoUploader({
         </div>
       )}
 
-      {sorted.length === 5 && (
+      {sorted.length === MAX_PHOTOS && (
         <p className="text-xs text-bronze italic mt-2">
-          Limite de 5 photos atteinte. Supprime-en une pour en ajouter d'autres.
+          Limite de {MAX_PHOTOS} photos atteinte. Supprime-en une pour en ajouter d&apos;autres.
         </p>
       )}
     </div>
