@@ -4,9 +4,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder
 const supabaseHost = new URL(supabaseUrl).hostname;
 
 const nextConfig: NextConfig = {
-  // Autorise le dev server à servir les bundles aux origines LAN.
-  // Syntaxe glob — pas CIDR. Couvre les plages d'IP les plus communes
-  // pour le WiFi domestique.
+  // Permet l'accès dev depuis le LAN
   allowedDevOrigins: [
     'localhost',
     '127.0.0.1',
@@ -19,9 +17,17 @@ const nextConfig: NextConfig = {
     '10.0.1.*',
     '*.local',
   ],
+  experimental: {
+    // Photos uploadées en data URL base64 → dépasse vite 1 MB.
+    serverActions: { bodySizeLimit: '10mb' },
+  },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: supabaseHost, pathname: '/storage/v1/object/public/**' },
+      // Couvre tout chemin sur le host Supabase courant (pas que /storage/v1/...)
+      { protocol: 'https', hostname: supabaseHost },
+      // Wildcard explicite si l'env var n'est pas dispo au build
+      { protocol: 'https', hostname: '*.supabase.co' },
+      // Photos de profil Google (pour les avis)
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'lh4.googleusercontent.com' },
       { protocol: 'https', hostname: 'lh5.googleusercontent.com' },

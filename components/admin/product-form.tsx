@@ -42,8 +42,9 @@ export function ProductForm({
         </select>
       </Field>
 
-      <Field label="Sous-catégorie">
-        <select name="subcategory_id" required defaultValue={defaults?.subcategory_id} className="w-full rounded border border-navy/20 px-3 py-2">
+      <Field label="Sous-catégorie (optionnel)">
+        <select name="subcategory_id" defaultValue={defaults?.subcategory_id ?? 'none'} className="w-full rounded border border-navy/20 px-3 py-2">
+          <option value="none">— Aucune —</option>
           {subs.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
         </select>
       </Field>

@@ -9,7 +9,13 @@ import { ensureUniqueSlug } from '@/lib/unique-slug';
 
 const productSchema = z.object({
   name: z.string().min(1),
-  subcategory_id: z.string().uuid(),
+  // Sous-catégorie optionnelle : '' ou null acceptés
+  subcategory_id: z
+    .string()
+    .uuid()
+    .nullable()
+    .or(z.literal('').transform(() => null))
+    .or(z.literal('none').transform(() => null)),
   price: z.string().min(1),
   quantity: z.coerce.number().int().min(0),
   condition: z.enum(['neuf', 'tres_bon_etat', 'bon_etat', 'etat_usage']),

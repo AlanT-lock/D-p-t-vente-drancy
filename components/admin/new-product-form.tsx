@@ -199,12 +199,13 @@ export function NewProductForm({
         </select>
       </Field>
 
-      <Field label="Sous-catégorie">
+      <Field label="Sous-catégorie (optionnel)">
         <select
           name="subcategory_id"
-          required
+          defaultValue="none"
           className="w-full rounded border border-navy/20 px-3 py-2"
         >
+          <option value="none">— Aucune —</option>
           {subs.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}

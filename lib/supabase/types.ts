@@ -20,7 +20,7 @@ export type Database = {
       products: {
         Row: {
           id: string;
-          subcategory_id: string;
+          subcategory_id: string | null;
           name: string;
           slug: string;
           description: string | null;
@@ -33,7 +33,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
-          subcategory_id: string;
+          subcategory_id?: string | null;
           name: string;
           slug: string;
           description?: string | null;
