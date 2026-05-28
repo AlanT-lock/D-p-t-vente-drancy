@@ -9,12 +9,7 @@ export function AdminNav({ slug }: { slug: string }) {
         <Link href={`/${slug}/produits`}>Produits</Link>
         <Link href={`/${slug}/categories`}>Catégories</Link>
       </div>
-      <div className="flex items-center gap-3">
-        <AdminSearchTrigger adminSlug={slug} />
-        <form action={`/${slug}/logout`} method="post">
-          <button className="text-xs underline">Déconnexion</button>
-        </form>
-      </div>
+      <AdminSearchTrigger adminSlug={slug} />
     </nav>
   );
 }
