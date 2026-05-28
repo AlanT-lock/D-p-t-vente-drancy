@@ -50,15 +50,13 @@ export default async function CategoryPage({
         ))}
       </div>
 
-      <div className="grid md:grid-cols-[220px_1fr] gap-8 mt-8">
-        <Filters />
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-sm text-bronze">{products.length} produit{products.length > 1 ? 's' : ''}</p>
-            <SortSelect />
-          </div>
-          <ProductGrid products={products} subcategoryNameById={subcategoryNameById} />
+      <div className="mt-8">
+        <div className="flex justify-between items-center mb-2 gap-2 flex-wrap">
+          <p className="text-sm text-bronze">{products.length} produit{products.length > 1 ? 's' : ''}</p>
+          <SortSelect />
         </div>
+        <Filters />
+        <ProductGrid products={products} subcategoryNameById={subcategoryNameById} />
       </div>
     </div>
   );
