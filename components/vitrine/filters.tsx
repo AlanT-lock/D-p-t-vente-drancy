@@ -38,12 +38,12 @@ export function Filters({ maxPriceDefault = 1000 }: { maxPriceDefault?: number }
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-full border border-navy/30 bg-parchment-light px-4 py-2 text-sm font-medium hover:border-brass active:bg-brass/10"
+          className="inline-flex items-center gap-2 h-11 rounded-full border border-navy/30 bg-parchment-light px-5 text-sm font-medium leading-none hover:border-brass active:bg-brass/10"
         >
           <SlidersHorizontal className="size-4" />
-          Filtres
+          <span>Filtres</span>
           {activeCount > 0 && (
-            <span className="bg-navy text-parchment text-[10px] font-bold rounded-full px-1.5 min-w-[18px] text-center">
+            <span className="bg-navy text-parchment text-[10px] font-bold rounded-full h-5 min-w-5 inline-flex items-center justify-center px-1.5 leading-none">
               {activeCount}
             </span>
           )}
