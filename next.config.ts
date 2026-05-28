@@ -4,17 +4,20 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder
 const supabaseHost = new URL(supabaseUrl).hostname;
 
 const nextConfig: NextConfig = {
-  // Autorise l'accès depuis le réseau local (192.168.x.x, 10.x.x.x, *.local)
-  // Sans ça, Next 16 bloque silencieusement le bundle JS en dev → pas d'hydration mobile.
+  // Autorise le dev server à servir les bundles aux origines LAN.
+  // Syntaxe glob — pas CIDR. Couvre les plages d'IP les plus communes
+  // pour le WiFi domestique.
   allowedDevOrigins: [
-    '192.168.0.0/16',
-    '192.168.1.1',
-    '192.168.1.2',
-    '192.168.1.3',
-    '192.168.1.4',
-    '192.168.1.5',
+    'localhost',
+    '127.0.0.1',
+    '192.168.0.*',
+    '192.168.1.*',
+    '192.168.2.*',
+    '192.168.3.*',
+    '192.168.10.*',
+    '10.0.0.*',
+    '10.0.1.*',
     '*.local',
-    '*',
   ],
   images: {
     remotePatterns: [
