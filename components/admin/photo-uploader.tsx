@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ImagePlus, Loader2, X, Star, Camera } from 'lucide-react';
 import { publicEnv } from '@/lib/env';
 import { addPhoto, deletePhoto } from '@/app/[adminSlug]/produits/photo-actions';
-import { compressToWebpDataUrl, dataUrlToFile } from '@/lib/image';
+import { compressToWebpFile, dataUrlToFile } from '@/lib/image';
 import { CameraCapture } from './camera-capture';
 
 const MAX_PHOTOS = 5;
@@ -33,8 +33,11 @@ export function PhotoUploader({
     for (const file of list) {
       setPending((n) => n + 1);
       try {
-        const dataUrl = await compressToWebpDataUrl(file);
-        await addPhoto(productId, dataUrl);
+        const compressed = await compressToWebpFile(file);
+        const fd = new FormData();
+        fd.append('productId', productId);
+        fd.append('photo', compressed);
+        await addPhoto(fd);
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Upload échoué');
       } finally {
