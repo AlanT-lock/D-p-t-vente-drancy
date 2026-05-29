@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { ProductRow } from '@/components/admin/product-row';
-import { deleteProductFromList, setProductQuantity } from './actions';
+import { deleteProductFromListForm, setProductQuantity } from './actions';
 import type { Condition } from '@/lib/condition';
 
 type Row = {
@@ -37,12 +37,9 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
   const products = (productsData ?? []) as unknown as Row[];
   const categories = (catsData ?? []) as unknown as Cat[];
 
-  // Index sub_id -> category id, et category id -> Cat
   const subToCat = new Map<string, string>();
   categories.forEach((c) => (c.subcategories ?? []).forEach((s) => subToCat.set(s.id, c.id)));
-  const catById = new Map(categories.map((c) => [c.id, c]));
 
-  // Group products by category id
   const grouped = new Map<string, Row[]>();
   const orphans: Row[] = [];
   for (const p of products) {
@@ -96,7 +93,7 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
                       product={p}
                       adminSlug={adminSlug}
                       setQuantity={setProductQuantity.bind(null, p.id)}
-                      deleteAction={deleteProductFromList.bind(null, p.id)}
+                      deleteAction={deleteProductFromListForm}
                     />
                   ))}
                 </ul>
@@ -107,11 +104,13 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
           {orphans.length > 0 && (
             <details
               open
-              className="bg-parchment-light/50 border border-red-700/30 rounded-lg overflow-hidden"
+              className="bg-parchment-light/50 border border-navy/30 rounded-lg overflow-hidden"
             >
-              <summary className="cursor-pointer select-none px-4 py-3 flex items-center justify-between bg-red-700/5">
-                <span className="font-serif text-lg text-red-700">Sans catégorie</span>
-                <span className="text-xs text-red-700">{orphans.length}</span>
+              <summary className="cursor-pointer select-none px-4 py-3 flex items-center justify-between bg-parchment-light">
+                <span className="font-serif text-lg">Sans catégorie</span>
+                <span className="text-xs text-bronze">
+                  {orphans.length} produit{orphans.length > 1 ? 's' : ''}
+                </span>
               </summary>
               <ul className="p-3 space-y-2">
                 {orphans.map((p) => (
@@ -120,14 +119,12 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
                     product={p}
                     adminSlug={adminSlug}
                     setQuantity={setProductQuantity.bind(null, p.id)}
-                    deleteAction={deleteProductFromList.bind(null, p.id)}
+                    deleteAction={deleteProductFromListForm}
                   />
                 ))}
               </ul>
             </details>
           )}
-          {/* catById intentionally used implicitly via categories.map */}
-          <span hidden>{catById.size}</span>
         </div>
       )}
     </div>

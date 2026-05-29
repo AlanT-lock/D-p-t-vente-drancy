@@ -143,8 +143,16 @@ export async function deleteProduct(id: string): Promise<void> {
 
 export async function deleteProductFromList(id: string): Promise<void> {
   const supabase = await requireAuth();
-  await supabase.from('products').delete().eq('id', id);
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) throw new Error(`Suppression : ${error.message}`);
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+}
+
+/** Variante FormData (passée comme `action` à un form, ou via fd.append). */
+export async function deleteProductFromListForm(formData: FormData): Promise<void> {
+  const id = String(formData.get('id') ?? '');
+  if (!id) throw new Error('id manquant');
+  await deleteProductFromList(id);
 }
 
 export async function setProductQuantity(id: string, formData: FormData): Promise<void> {
