@@ -23,3 +23,9 @@ export async function getCurrentRole(): Promise<Role | null> {
   const member = await getCurrentMember();
   return member?.role ?? null;
 }
+
+/** Renvoie le membre connecté s'il est admin, sinon null. */
+export async function requireAdmin(): Promise<{ id: string; email: string; role: Role } | null> {
+  const member = await getCurrentMember();
+  return member && member.role === 'admin' ? member : null;
+}

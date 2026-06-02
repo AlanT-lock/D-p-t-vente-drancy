@@ -1,15 +1,16 @@
 'use server';
 import { revalidatePath } from 'next/cache';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getCurrentMember } from '@/lib/auth/role';
+import { requireAdmin } from '@/lib/auth/role';
 import { parseInviteEmail, canDeleteMember } from '@/lib/auth/accounts';
 import { siteUrl } from '@/lib/site';
+import { serverEnv } from '@/lib/env';
 
-const slug = () => process.env.ADMIN_SLUG;
+const slug = () => serverEnv().ADMIN_SLUG;
 
 export async function inviteEmployee(formData: FormData): Promise<{ error: string } | { ok: true }> {
-  const actor = await getCurrentMember();
-  if (!actor || actor.role !== 'admin') return { error: 'Action réservée aux administrateurs.' };
+  const actor = await requireAdmin();
+  if (!actor) return { error: 'Action réservée aux administrateurs.' };
 
   const parsed = parseInviteEmail(String(formData.get('email') ?? ''));
   if (!parsed.ok) return { error: parsed.error };
@@ -24,8 +25,8 @@ export async function inviteEmployee(formData: FormData): Promise<{ error: strin
 }
 
 export async function deleteEmployee(formData: FormData): Promise<{ error: string } | { ok: true }> {
-  const actor = await getCurrentMember();
-  if (!actor || actor.role !== 'admin') return { error: 'Action réservée aux administrateurs.' };
+  const actor = await requireAdmin();
+  if (!actor) return { error: 'Action réservée aux administrateurs.' };
 
   const targetId = String(formData.get('id') ?? '');
   if (!targetId) return { error: 'Compte introuvable.' };

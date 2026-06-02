@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getCurrentMember } from '@/lib/auth/role';
+import { requireAdmin } from '@/lib/auth/role';
 import { InviteForm, DeleteEmployeeButton } from './accounts-ui';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ComptesPage({ params }: { params: Promise<{ adminSlug: string }> }) {
   const { adminSlug } = await params;
-  const member = await getCurrentMember();
-  if (!member || member.role !== 'admin') {
+  const member = await requireAdmin();
+  if (!member) {
     redirect(`/${adminSlug}`);
   }
 

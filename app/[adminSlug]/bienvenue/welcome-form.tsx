@@ -12,14 +12,18 @@ export function WelcomeForm({ adminSlug }: { adminSlug: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  // Le lien d'invitation établit la session automatiquement (detectSessionInUrl).
-  // On vérifie qu'une session existe avant d'afficher le formulaire.
+  // Le lien d'invitation établit la session via l'URL ; on écoute onAuthStateChange
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-      else setSessionError(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setReady(true);
+        setSessionError(false);
+      } else {
+        setSessionError(true);
+      }
     });
+    return () => subscription.unsubscribe();
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
