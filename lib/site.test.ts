@@ -8,7 +8,7 @@ describe('siteUrl', () => {
 
   it('utilise le domaine de production par défaut', async () => {
     const { siteUrl } = await import('./site');
-    expect(siteUrl()).toBe('https://www.depotventedrancy.fr');
+    expect(siteUrl()).toBe('https://depotventedrancy.fr');
   });
 
   it('respecte NEXT_PUBLIC_SITE_URL si défini, sans slash final', async () => {

@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = 'https://www.depotventedrancy.fr';
+const DEFAULT_SITE_URL = 'https://depotventedrancy.fr';
 
 /** URL de base du site, sans slash final. Utilisée pour les redirections d'auth. */
 export function siteUrl(): string {
