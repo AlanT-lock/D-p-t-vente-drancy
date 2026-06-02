@@ -1,0 +1,145 @@
+<!--
+  Modèle d'email Supabase — « Invite user »
+  À coller dans : Supabase Dashboard → Authentication → Email Templates → Invite user
+  Variable utilisée : {{ .ConfirmationURL }} (lien d'activation du compte)
+  Design raccord avec le site (parchment / navy / brass, titres serif).
+-->
+<!DOCTYPE html>
+<html lang="fr" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light only">
+  <title>Invitation — Dépôt Vente de Drancy</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td, a { font-family: Georgia, 'Times New Roman', serif !important; }
+  </style>
+  <![endif]-->
+  <style type="text/css">
+    body { margin:0; padding:0; width:100% !important; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; background-color:#F4ECD8; }
+    table { border-collapse:collapse !important; }
+    img { border:0; line-height:100%; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    a { text-decoration:none; }
+    @media only screen and (max-width:600px) {
+      .container { width:100% !important; }
+      .px { padding-left:24px !important; padding-right:24px !important; }
+      .btn-a { display:block !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#F4ECD8;">
+  <!-- Préheader masqué -->
+  <div style="display:none; max-height:0; overflow:hidden; opacity:0; font-size:1px; line-height:1px; color:#F4ECD8;">
+    Votre accès à l'espace de gestion du Dépôt Vente de Drancy vous attend.
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F4ECD8;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+
+        <!-- Carte principale -->
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:#FBF6E8; border:1px solid #E5DAC0; border-radius:14px; overflow:hidden;">
+
+          <!-- Bandeau navy -->
+          <tr>
+            <td align="center" style="background-color:#1B2A3A; padding:30px 40px;">
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:#C9A961; margin-bottom:6px;">
+                Espace de gestion
+              </div>
+              <div style="font-family:Georgia,'Times New Roman',serif; font-size:26px; font-weight:bold; color:#F4ECD8; line-height:1.2;">
+                Dépôt Vente de Drancy
+              </div>
+            </td>
+          </tr>
+
+          <!-- Liseré brass -->
+          <tr><td style="height:4px; background-color:#C9A961; line-height:4px; font-size:0;">&nbsp;</td></tr>
+
+          <!-- Corps -->
+          <tr>
+            <td class="px" style="padding:40px 48px 8px 48px;">
+              <h1 style="margin:0 0 18px 0; font-family:Georgia,'Times New Roman',serif; font-size:24px; font-weight:bold; color:#1B2A3A; line-height:1.3;">
+                Vous êtes invité·e à rejoindre l'équipe
+              </h1>
+              <p style="margin:0 0 16px 0; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:1.65; color:#3a3a3a;">
+                Bonjour,
+              </p>
+              <p style="margin:0 0 24px 0; font-family:Arial,Helvetica,sans-serif; font-size:16px; line-height:1.65; color:#3a3a3a;">
+                Un administrateur vous a créé un compte employé pour gérer le catalogue
+                du <strong style="color:#1B2A3A;">Dépôt Vente de Drancy</strong>. Pour activer votre accès,
+                il vous suffit de définir votre mot de passe en cliquant sur le bouton ci-dessous.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Bouton -->
+          <tr>
+            <td class="px" align="center" style="padding:8px 48px 12px 48px;">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .ConfirmationURL }}" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="50%" strokecolor="#1B2A3A" fillcolor="#1B2A3A">
+                <w:anchorlock/>
+                <center style="color:#F4ECD8;font-family:Georgia,serif;font-size:16px;font-weight:bold;">Activer mon compte</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-- -->
+              <a class="btn-a" href="{{ .ConfirmationURL }}" target="_blank"
+                 style="display:inline-block; background-color:#1B2A3A; color:#F4ECD8; font-family:Georgia,'Times New Roman',serif; font-size:16px; font-weight:bold; line-height:52px; text-align:center; text-decoration:none; padding:0 40px; border-radius:30px;">
+                Activer mon compte
+              </a>
+              <!--<![endif]-->
+            </td>
+          </tr>
+
+          <!-- Lien de secours -->
+          <tr>
+            <td class="px" style="padding:16px 48px 36px 48px;">
+              <p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; color:#8B6F47;">
+                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :
+              </p>
+              <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; word-break:break-all;">
+                <a href="{{ .ConfirmationURL }}" target="_blank" style="color:#1B2A3A; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Séparateur -->
+          <tr>
+            <td class="px" style="padding:0 48px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="border-top:1px solid #E5DAC0; height:1px; line-height:1px; font-size:0;">&nbsp;</td></tr></table>
+            </td>
+          </tr>
+
+          <!-- Note sécurité -->
+          <tr>
+            <td class="px" style="padding:24px 48px 40px 48px;">
+              <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; color:#8B6F47;">
+                Ce lien d'invitation est personnel et expire après un certain temps.
+                Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet email en toute sécurité.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Pied de page -->
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px;">
+          <tr>
+            <td align="center" style="padding:24px 40px;">
+              <p style="margin:0; font-family:Georgia,'Times New Roman',serif; font-size:14px; color:#1B2A3A;">
+                Dépôt Vente de Drancy
+              </p>
+              <p style="margin:6px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#8B6F47;">
+                Email automatique — merci de ne pas y répondre.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
