@@ -179,7 +179,7 @@ describe('siteUrl', () => {
 
   it('utilise le domaine de production par défaut', async () => {
     const { siteUrl } = await import('./site');
-    expect(siteUrl()).toBe('https://depotventredrancy.fr');
+    expect(siteUrl()).toBe('https://depotventedrancy.fr');
   });
 
   it('respecte NEXT_PUBLIC_SITE_URL si défini, sans slash final', async () => {
@@ -198,7 +198,7 @@ Expected: FAIL (`Cannot find module './site'`).
 - [ ] **Step 3: Implémenter `lib/site.ts`**
 
 ```ts
-const DEFAULT_SITE_URL = 'https://depotventredrancy.fr';
+const DEFAULT_SITE_URL = 'https://depotventedrancy.fr';
 
 /** URL de base du site, sans slash final. Utilisée pour les redirections d'auth. */
 export function siteUrl(): string {
@@ -880,8 +880,8 @@ git commit -m "feat(middleware): route bienvenue accessible sans session (invita
 Dans `.env.local.example`, ajouter après la ligne `ADMIN_SLUG=admin-xY3kQ9` :
 
 ```
-# URL de base pour les redirections d'invitation (défaut: https://depotventredrancy.fr)
-NEXT_PUBLIC_SITE_URL=https://depotventredrancy.fr
+# URL de base pour les redirections d'invitation (défaut: https://depotventedrancy.fr)
+NEXT_PUBLIC_SITE_URL=https://depotventedrancy.fr
 ```
 
 - [ ] **Step 2: Commit**
@@ -920,10 +920,10 @@ Ces étapes ne sont pas du code mais sont nécessaires pour que la fonctionnalit
 
 1. **Appliquer la migration** `0007_roles.sql` sur Supabase (SQL editor du dashboard, ou `supabase db push` si le projet est lié).
 2. **Supabase → Authentication → URL Configuration** :
-   - Site URL : `https://depotventredrancy.fr`
-   - Redirect URLs : ajouter `https://depotventredrancy.fr/**` et `http://localhost:3000/**`.
+   - Site URL : `https://depotventedrancy.fr`
+   - Redirect URLs : ajouter `https://depotventedrancy.fr/**` et `http://localhost:3000/**`.
 3. **Supabase → Authentication → Email Templates → Invite user** : vérifier que le bouton pointe vers `{{ .ConfirmationURL }}` (défaut OK).
-4. **Vercel** : ajouter la variable d'env `NEXT_PUBLIC_SITE_URL=https://depotventredrancy.fr` (Production), puis redéployer.
+4. **Vercel** : ajouter la variable d'env `NEXT_PUBLIC_SITE_URL=https://depotventedrancy.fr` (Production), puis redéployer.
 5. **Test manuel de bout en bout** : se connecter en admin → page Comptes → inviter un email → recevoir le mail → définir le mot de passe sur `/bienvenue` → vérifier l'accès employé (pas de lien « Comptes ») → en admin, supprimer cet employé.
 
 ---

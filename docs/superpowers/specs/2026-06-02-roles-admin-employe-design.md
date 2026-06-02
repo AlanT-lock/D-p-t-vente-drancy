@@ -21,7 +21,7 @@ Introduire deux rôles :
 
 L'ajout d'un employé déclenche un **email d'invitation Supabase** ; l'employé crée
 son mot de passe via le lien reçu. Le domaine de production est
-`https://depotventredrancy.fr` (configuré sur Vercel).
+`https://depotventedrancy.fr` (configuré sur Vercel).
 
 ## Décisions de conception
 
@@ -120,7 +120,7 @@ Server actions dans `app/[adminSlug]/comptes/actions.ts` :
   - `requireAdmin()` (sinon erreur).
   - valide l'email (zod).
   - `createAdminClient().auth.admin.inviteUserByEmail(email, { redirectTo: '<baseUrl>/<adminSlug>/bienvenue' })`.
-  - `baseUrl` = `https://depotventredrancy.fr` en prod, `request`/env-dérivé en dev.
+  - `baseUrl` = `https://depotventedrancy.fr` en prod, `request`/env-dérivé en dev.
   - retourne `{ error }` visible dans l'UI en cas d'échec ; sinon `revalidatePath`.
 - `deleteEmployee(formData)` :
   - `requireAdmin()`.
@@ -129,7 +129,7 @@ Server actions dans `app/[adminSlug]/comptes/actions.ts` :
   - `revalidatePath`.
 
 L'URL de base de redirection est centralisée (constante `SITE_URL` dérivée d'une env
-publique optionnelle `NEXT_PUBLIC_SITE_URL`, défaut `https://depotventredrancy.fr`).
+publique optionnelle `NEXT_PUBLIC_SITE_URL`, défaut `https://depotventedrancy.fr`).
 
 ## Flux d'invitation / création de mot de passe
 
@@ -145,12 +145,12 @@ publique optionnelle `NEXT_PUBLIC_SITE_URL`, défaut `https://depotventredrancy.
 ## Config Supabase (dashboard — étapes fournies à l'utilisateur)
 
 1. **Authentication → URL Configuration**
-   - Site URL : `https://depotventredrancy.fr`
-   - Redirect URLs : ajouter `https://depotventredrancy.fr/**` et `http://localhost:3000/**`.
+   - Site URL : `https://depotventedrancy.fr`
+   - Redirect URLs : ajouter `https://depotventedrancy.fr/**` et `http://localhost:3000/**`.
 2. **Authentication → Email Templates → Invite user** : vérifier que le template pointe
    bien vers `{{ .ConfirmationURL }}` (défaut OK).
 3. Aucune nouvelle clé serveur : on réutilise `SUPABASE_SERVICE_ROLE_KEY`.
-4. (Optionnel) Ajouter `NEXT_PUBLIC_SITE_URL=https://depotventredrancy.fr` aux env Vercel
+4. (Optionnel) Ajouter `NEXT_PUBLIC_SITE_URL=https://depotventedrancy.fr` aux env Vercel
    pour rendre l'URL de redirection explicite.
 
 ## Gestion des erreurs
