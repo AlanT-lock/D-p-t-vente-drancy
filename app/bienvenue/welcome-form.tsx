@@ -11,23 +11,37 @@ export function WelcomeForm() {
   const [pending, setPending] = useState(false);
 
   // Le lien d'invitation établit la session via le jeton dans l'URL ;
-  // on écoute onAuthStateChange (le client navigateur lit le hash automatiquement).
+  // le client navigateur lit le hash automatiquement. On attend qu'une session
+  // apparaisse (onAuthStateChange ou getSession) ; sinon on conclut au lien expiré.
   useEffect(() => {
-    // Si Supabase a renvoyé une erreur dans le hash (lien expiré/déjà utilisé), on l'affiche.
-    if (typeof window !== 'undefined' && /error|otp_expired|access_denied/.test(window.location.hash)) {
+    if (typeof window === 'undefined') return;
+    // Erreur explicite renvoyée par Supabase dans le hash (lien expiré/déjà utilisé).
+    if (/error=|otp_expired|error_code=/.test(window.location.hash)) {
       setSessionError(true);
       return;
     }
     const supabase = createClient();
+    let settled = false;
+    const markReady = () => {
+      if (settled) return;
+      settled = true;
+      setReady(true);
+      setSessionError(false);
+    };
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        setReady(true);
-        setSessionError(false);
-      } else {
-        setSessionError(true);
-      }
+      if (session) markReady();
     });
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) markReady();
+    });
+    // Aucun jeton de session valide après un délai → lien invalide ou expiré.
+    const timer = setTimeout(() => {
+      if (!settled) setSessionError(true);
+    }, 5000);
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   async function onSubmit(e: React.FormEvent) {
