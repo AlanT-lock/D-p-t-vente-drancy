@@ -15,7 +15,15 @@ export type Database = {
         Row: { id: string; category_id: string; name: string; slug: string; position: number };
         Insert: { id?: string; category_id: string; name: string; slug: string; position?: number };
         Update: Partial<Database['public']['Tables']['subcategories']['Insert']>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'subcategories_category_id_fkey';
+            columns: ['category_id'];
+            isOneToOne: false;
+            referencedRelation: 'categories';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       products: {
         Row: {
@@ -51,7 +59,15 @@ export type Database = {
         Row: { id: string; product_id: string; storage_path: string; position: number };
         Insert: { id?: string; product_id: string; storage_path: string; position: number };
         Update: Partial<Database['public']['Tables']['product_photos']['Insert']>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'product_photos_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       google_reviews_cache: {
         Row: {
@@ -81,9 +97,17 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['google_business_info']['Insert']>;
         Relationships: [];
       };
+      profiles: {
+        Row: { id: string; email: string; role: 'admin' | 'employee'; created_at: string };
+        Insert: { id: string; email: string; role?: 'admin' | 'employee'; created_at?: string };
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      is_admin: { Args: Record<string, never>; Returns: boolean };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
