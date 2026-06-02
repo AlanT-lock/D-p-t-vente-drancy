@@ -1,0 +1,27 @@
+import { z } from 'zod';
+
+export type Role = 'admin' | 'employee';
+export type Member = { id: string; role: Role };
+
+// Zod v4: z.email() is the top-level email schema; chain .trim().toLowerCase() for normalization.
+const emailSchema = z.email().transform((val) => val.trim().toLowerCase());
+
+export type ParseResult = { ok: true; email: string } | { ok: false; error: string };
+
+export function parseInviteEmail(raw: string): ParseResult {
+  const parsed = emailSchema.safeParse(raw.trim().toLowerCase());
+  if (!parsed.success) return { ok: false, error: 'Adresse email invalide.' };
+  return { ok: true, email: parsed.data };
+}
+
+export type GuardResult = { ok: true } | { ok: false; error: string };
+
+export function canDeleteMember(actor: Member, target: Member): GuardResult {
+  if (actor.id === target.id) {
+    return { ok: false, error: 'Vous ne pouvez pas supprimer votre propre compte.' };
+  }
+  if (target.role === 'admin') {
+    return { ok: false, error: 'Impossible de supprimer un compte administrateur.' };
+  }
+  return { ok: true };
+}
