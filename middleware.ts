@@ -16,8 +16,7 @@ export async function middleware(request: NextRequest) {
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
 
     const isLogin = path === `/${adminSlug}/login`;
-    const isWelcome = path === `/${adminSlug}/bienvenue`;
-    if (!user && !isLogin && !isWelcome) {
+    if (!user && !isLogin) {
       const url = request.nextUrl.clone();
       url.pathname = `/${adminSlug}/login`;
       return NextResponse.redirect(url);

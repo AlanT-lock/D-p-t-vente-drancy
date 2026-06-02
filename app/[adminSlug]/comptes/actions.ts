@@ -16,7 +16,7 @@ export async function inviteEmployee(formData: FormData): Promise<{ error: strin
   if (!parsed.ok) return { error: parsed.error };
 
   const admin = createAdminClient();
-  const redirectTo = `${siteUrl()}/${slug()}/bienvenue`;
+  const redirectTo = `${siteUrl()}/bienvenue`;
   const { error } = await admin.auth.admin.inviteUserByEmail(parsed.email, { redirectTo });
   if (error) return { error: error.message };
 

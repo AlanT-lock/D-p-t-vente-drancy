@@ -1,10 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-export function WelcomeForm({ adminSlug }: { adminSlug: string }) {
-  const router = useRouter();
+export function WelcomeForm() {
   const [ready, setReady] = useState(false);
   const [sessionError, setSessionError] = useState(false);
   const [password, setPassword] = useState('');
@@ -12,8 +10,14 @@ export function WelcomeForm({ adminSlug }: { adminSlug: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  // Le lien d'invitation établit la session via l'URL ; on écoute onAuthStateChange
+  // Le lien d'invitation établit la session via le jeton dans l'URL ;
+  // on écoute onAuthStateChange (le client navigateur lit le hash automatiquement).
   useEffect(() => {
+    // Si Supabase a renvoyé une erreur dans le hash (lien expiré/déjà utilisé), on l'affiche.
+    if (typeof window !== 'undefined' && /error|otp_expired|access_denied/.test(window.location.hash)) {
+      setSessionError(true);
+      return;
+    }
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
@@ -40,19 +44,25 @@ export function WelcomeForm({ adminSlug }: { adminSlug: string }) {
     setPending(true);
     const supabase = createClient();
     const { error: updateError } = await supabase.auth.updateUser({ password });
-    setPending(false);
     if (updateError) {
+      setPending(false);
       setError(updateError.message);
       return;
     }
-    router.push(`/${adminSlug}`);
+    // Navigation pleine page : la route serveur lit le cookie de session
+    // puis redirige vers l'espace admin (le slug reste secret).
+    window.location.assign('/bienvenue/go');
   }
 
   if (sessionError) {
     return (
-      <p className="text-sm text-red-700">
-        Lien d&apos;invitation invalide ou expiré. Demandez à l&apos;administrateur de vous réinviter.
-      </p>
+      <div className="w-full max-w-sm bg-parchment-light border border-navy/10 rounded-lg p-6 text-center">
+        <h1 className="font-serif text-2xl mb-2">Lien expiré</h1>
+        <p className="text-sm text-bronze">
+          Ce lien d&apos;invitation est invalide ou a déjà été utilisé. Demandez à votre
+          administrateur de vous renvoyer une invitation.
+        </p>
+      </div>
     );
   }
   if (!ready) {
