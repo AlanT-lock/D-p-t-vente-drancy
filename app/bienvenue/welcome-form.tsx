@@ -1,48 +1,14 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
+// Affiché uniquement quand la session est déjà établie (cf. app/bienvenue/page.tsx).
+// Le navigateur lit la session dans les cookies ; updateUser définit le mot de passe.
 export function WelcomeForm() {
-  const [ready, setReady] = useState(false);
-  const [sessionError, setSessionError] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-
-  // Le lien d'invitation établit la session via le jeton dans l'URL ;
-  // le client navigateur lit le hash automatiquement. On attend qu'une session
-  // apparaisse (onAuthStateChange ou getSession) ; sinon on conclut au lien expiré.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // Erreur explicite renvoyée par Supabase dans le hash (lien expiré/déjà utilisé).
-    if (/error=|otp_expired|error_code=/.test(window.location.hash)) {
-      setSessionError(true);
-      return;
-    }
-    const supabase = createClient();
-    let settled = false;
-    const markReady = () => {
-      if (settled) return;
-      settled = true;
-      setReady(true);
-      setSessionError(false);
-    };
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) markReady();
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) markReady();
-    });
-    // Aucun jeton de session valide après un délai → lien invalide ou expiré.
-    const timer = setTimeout(() => {
-      if (!settled) setSessionError(true);
-    }, 5000);
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
-    };
-  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,21 +32,6 @@ export function WelcomeForm() {
     // Navigation pleine page : la route serveur lit le cookie de session
     // puis redirige vers l'espace admin (le slug reste secret).
     window.location.assign('/bienvenue/go');
-  }
-
-  if (sessionError) {
-    return (
-      <div className="w-full max-w-sm bg-parchment-light border border-navy/10 rounded-lg p-6 text-center">
-        <h1 className="font-serif text-2xl mb-2">Lien expiré</h1>
-        <p className="text-sm text-bronze">
-          Ce lien d&apos;invitation est invalide ou a déjà été utilisé. Demandez à votre
-          administrateur de vous renvoyer une invitation.
-        </p>
-      </div>
-    );
-  }
-  if (!ready) {
-    return <p className="text-sm text-bronze">Vérification de votre invitation…</p>;
   }
 
   return (

@@ -1,7 +1,10 @@
 <!--
   Modèle d'email Supabase — « Invite user »
   À coller dans : Supabase Dashboard → Authentication → Email Templates → Invite user
-  Variable utilisée : {{ .ConfirmationURL }} (lien d'activation du compte)
+  Lien d'activation : on pointe vers notre route serveur /auth/confirm avec
+  {{ .TokenHash }} (vérification côté serveur via verifyOtp → session en cookies,
+  sans dépendre du flux PKCE navigateur). Ne PAS utiliser {{ .ConfirmationURL }}.
+  Prérequis : « Site URL » du projet Supabase = domaine canonique du site.
   Design raccord avec le site (parchment / navy / brass, titres serif).
 -->
 <!DOCTYPE html>
@@ -79,13 +82,13 @@
           <tr>
             <td class="px" align="center" style="padding:8px 48px 12px 48px;">
               <!--[if mso]>
-              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .ConfirmationURL }}" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="50%" strokecolor="#1B2A3A" fillcolor="#1B2A3A">
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/bienvenue" style="height:52px;v-text-anchor:middle;width:300px;" arcsize="50%" strokecolor="#1B2A3A" fillcolor="#1B2A3A">
                 <w:anchorlock/>
                 <center style="color:#F4ECD8;font-family:Georgia,serif;font-size:16px;font-weight:bold;">Activer mon compte</center>
               </v:roundrect>
               <![endif]-->
               <!--[if !mso]><!-- -->
-              <a class="btn-a" href="{{ .ConfirmationURL }}" target="_blank"
+              <a class="btn-a" href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/bienvenue" target="_blank"
                  style="display:inline-block; background-color:#1B2A3A; color:#F4ECD8; font-family:Georgia,'Times New Roman',serif; font-size:16px; font-weight:bold; line-height:52px; text-align:center; text-decoration:none; padding:0 40px; border-radius:30px;">
                 Activer mon compte
               </a>
@@ -100,7 +103,7 @@
                 Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :
               </p>
               <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; word-break:break-all;">
-                <a href="{{ .ConfirmationURL }}" target="_blank" style="color:#1B2A3A; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+                <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/bienvenue" target="_blank" style="color:#1B2A3A; text-decoration:underline;">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/bienvenue</a>
               </p>
             </td>
           </tr>
