@@ -11,8 +11,15 @@ import {
 type SubRow = { id: string; name: string; slug: string; position: number };
 type CatWithSubs = { id: string; name: string; slug: string; subcategories: SubRow[] };
 
-export default async function CategoryDetailAdmin({ params }: { params: Promise<{ id: string }> }) {
+export default async function CategoryDetailAdmin({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string; n?: string }>;
+}) {
   const { id } = await params;
+  const { error, n } = await searchParams;
   const supabase = await createClient();
   const { data } = await supabase
     .from('categories')
@@ -23,8 +30,20 @@ export default async function CategoryDetailAdmin({ params }: { params: Promise<
   const cat = data as unknown as CatWithSubs;
   const subs = (cat.subcategories ?? []).slice().sort((a, b) => a.position - b.position);
 
+  const errorMessage =
+    error === 'produits'
+      ? `Impossible de supprimer : ${n ?? 'des'} produit(s) utilisent encore cette sous-catégorie. Réassignez-les à une autre sous-catégorie avant de la supprimer.`
+      : error === 'suppression'
+        ? 'La suppression a échoué. Veuillez réessayer.'
+        : null;
+
   return (
     <div>
+      {errorMessage && (
+        <p className="mb-4 rounded border border-red-700/40 bg-red-700/10 px-3 py-2 text-sm text-red-800">
+          {errorMessage}
+        </p>
+      )}
       {/* Renommer la catégorie */}
       <form
         action={async (fd: FormData) => {

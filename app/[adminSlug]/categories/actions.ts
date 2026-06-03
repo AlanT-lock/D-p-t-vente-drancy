@@ -77,9 +77,37 @@ export async function renameSubcategory(id: string, name: string): Promise<void>
     return (count ?? 0) > 0;
   });
   await supabase.from('subcategories').update({ name, slug }).eq('id', id);
+  revalidatePath(`/${process.env.ADMIN_SLUG}/categories/${existing.category_id}`);
+  revalidatePath(`/${process.env.ADMIN_SLUG}/categories`);
+  revalidatePath('/');
 }
 
 export async function deleteSubcategory(id: string): Promise<void> {
   const supabase = await requireAuth();
-  await supabase.from('subcategories').delete().eq('id', id);
+  const { data: sub } = await supabase
+    .from('subcategories')
+    .select('category_id')
+    .eq('id', id)
+    .single();
+  if (!sub) return;
+  const catPath = `/${process.env.ADMIN_SLUG}/categories/${sub.category_id}`;
+
+  // La FK products.subcategory_id est ON DELETE RESTRICT : si des produits y sont
+  // rattachés, la suppression échoue côté base. On le détecte pour afficher un
+  // message clair plutôt qu'un échec silencieux.
+  const { count } = await supabase
+    .from('products')
+    .select('*', { count: 'exact', head: true })
+    .eq('subcategory_id', id);
+  if ((count ?? 0) > 0) {
+    redirect(`${catPath}?error=produits&n=${count}`);
+  }
+
+  const { error } = await supabase.from('subcategories').delete().eq('id', id);
+  if (error) {
+    redirect(`${catPath}?error=suppression`);
+  }
+  revalidatePath(catPath);
+  revalidatePath('/');
+  redirect(catPath);
 }
