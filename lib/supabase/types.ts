@@ -34,7 +34,7 @@ export type Database = {
           description: string | null;
           price_cents: number;
           quantity: number;
-          condition: 'neuf' | 'tres_bon_etat' | 'bon_etat' | 'etat_usage';
+          condition: string;
           is_published: boolean;
           created_at: string;
           updated_at: string;
@@ -47,12 +47,18 @@ export type Database = {
           description?: string | null;
           price_cents: number;
           quantity?: number;
-          condition: 'neuf' | 'tres_bon_etat' | 'bon_etat' | 'etat_usage';
+          condition: string;
           is_published?: boolean;
           created_at?: string;
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['products']['Insert']>;
+        Relationships: [];
+      };
+      product_conditions: {
+        Row: { id: string; slug: string; label: string; position: number; created_at: string };
+        Insert: { id?: string; slug: string; label: string; position?: number; created_at?: string };
+        Update: Partial<Database['public']['Tables']['product_conditions']['Insert']>;
         Relationships: [];
       };
       product_photos: {

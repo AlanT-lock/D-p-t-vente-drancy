@@ -3,14 +3,17 @@ import Image from 'next/image';
 import { formatPrice } from '@/lib/format';
 import { publicEnv } from '@/lib/env';
 import type { ProductWithPhotos } from '@/lib/repos/types';
+import type { ConditionOption } from '@/lib/condition';
 import { ConditionBadge } from './condition-badge';
 
 export function ProductCard({
   product,
   subcategoryName,
+  conditions,
 }: {
   product: ProductWithPhotos;
   subcategoryName?: string;
+  conditions?: ConditionOption[];
 }) {
   const main = [...product.photos].sort((a, b) => a.position - b.position)[0];
   const imageUrl = main
@@ -40,7 +43,7 @@ export function ProductCard({
             {subcategoryName && (
               <span className="text-[10px] uppercase tracking-wider text-bronze">{subcategoryName}</span>
             )}
-            <ConditionBadge condition={product.condition} />
+            <ConditionBadge condition={product.condition} conditions={conditions} />
           </div>
           <h3 className="font-serif text-base mt-1">{product.name}</h3>
           <p className="font-semibold mt-1">{formatPrice(product.price_cents)}</p>

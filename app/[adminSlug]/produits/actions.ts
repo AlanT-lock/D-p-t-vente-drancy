@@ -18,7 +18,9 @@ const productSchema = z.object({
     .or(z.literal('none').transform(() => null)),
   price: z.string().min(1),
   quantity: z.coerce.number().int().min(0),
-  condition: z.enum(['neuf', 'tres_bon_etat', 'bon_etat', 'etat_usage']),
+  // États dynamiques (table product_conditions). La FK products.condition garantit
+  // la validité côté base ; le formulaire ne propose que des états existants.
+  condition: z.string().min(1),
   description: z.string().optional(),
   is_published: z.coerce.boolean().optional(),
 });

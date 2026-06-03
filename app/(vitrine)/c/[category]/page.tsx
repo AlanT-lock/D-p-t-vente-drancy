@@ -5,6 +5,7 @@ import { listProductsBySubcategory, type ListOpts } from '@/lib/repos/products';
 import { ProductGrid } from '@/components/vitrine/product-grid';
 import { Filters } from '@/components/vitrine/filters';
 import { SortSelect } from '@/components/vitrine/sort-select';
+import { getConditions } from '@/lib/repos/conditions';
 
 export const revalidate = 60;
 
@@ -34,6 +35,7 @@ export default async function CategoryPage({
   );
   const products = productsBySubs.flat();
   const subcategoryNameById = Object.fromEntries(category.subcategories.map((s) => [s.id, s.name]));
+  const conditions = await getConditions();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -55,8 +57,8 @@ export default async function CategoryPage({
           <p className="text-sm text-bronze">{products.length} produit{products.length > 1 ? 's' : ''}</p>
           <SortSelect />
         </div>
-        <Filters />
-        <ProductGrid products={products} subcategoryNameById={subcategoryNameById} />
+        <Filters conditions={conditions} />
+        <ProductGrid products={products} subcategoryNameById={subcategoryNameById} conditions={conditions} />
       </div>
     </div>
   );

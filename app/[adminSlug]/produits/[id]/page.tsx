@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ProductForm } from '@/components/admin/product-form';
 import { PhotoUploader } from '@/components/admin/photo-uploader';
 import { updateProduct, deleteProduct } from '../actions';
+import { getConditions } from '@/lib/repos/conditions';
 
 type Cat = { id: string; name: string; subcategories: { id: string; name: string; category_id: string }[] };
 type Photo = { id: string; position: number; storage_path: string };
@@ -11,7 +12,7 @@ type ProductWithPhotos = {
   name: string;
   price_cents: number;
   quantity: number;
-  condition: 'neuf' | 'tres_bon_etat' | 'bon_etat' | 'etat_usage';
+  condition: string;
   description: string | null;
   subcategory_id: string;
   is_published: boolean;
@@ -28,6 +29,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   if (!productRaw) notFound();
   const product = productRaw as unknown as ProductWithPhotos;
   const photos = product.photos ?? [];
+  const conditions = await getConditions();
   const update = updateProduct.bind(null, id);
   const del = deleteProduct.bind(null, id);
   const noPhotos = photos.length === 0;
@@ -53,6 +55,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         <ProductForm
           action={update}
           categories={(cats as unknown as Cat[]) ?? []}
+          conditions={conditions}
           submitLabel="Mettre à jour"
           defaults={{
             name: product.name,

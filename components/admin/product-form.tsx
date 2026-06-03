@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { CONDITIONS } from '@/lib/condition';
+import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 
 type Sub = { id: string; name: string; category_id: string };
 type Cat = { id: string; name: string; subcategories: Sub[] };
@@ -8,11 +8,13 @@ type Cat = { id: string; name: string; subcategories: Sub[] };
 export function ProductForm({
   action,
   categories,
+  conditions = DEFAULT_CONDITIONS,
   defaults,
   submitLabel,
 }: {
   action: (fd: FormData) => void | Promise<void>;
   categories: Cat[];
+  conditions?: ConditionOption[];
   defaults?: {
     name?: string;
     price?: string;
@@ -59,8 +61,8 @@ export function ProductForm({
       </div>
 
       <Field label="État">
-        <select name="condition" required defaultValue={defaults?.condition ?? 'bon_etat'} className="w-full rounded border border-navy/20 px-3 py-2">
-          {CONDITIONS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+        <select name="condition" required defaultValue={defaults?.condition ?? conditions[0]?.slug} className="w-full rounded border border-navy/20 px-3 py-2">
+          {conditions.map((c) => <option key={c.slug} value={c.slug}>{c.label}</option>)}
         </select>
       </Field>
 

@@ -2,7 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { searchProducts } from '@/lib/search/products';
 import { formatPrice } from '@/lib/format';
-import { conditionLabel, type Condition } from '@/lib/condition';
+import { conditionLabel } from '@/lib/condition';
+import { getConditions } from '@/lib/repos/conditions';
 import { publicEnv } from '@/lib/env';
 import { SearchForm } from '@/components/vitrine/search-form';
 
@@ -36,6 +37,8 @@ export default async function RecherchePage({ searchParams }: { searchParams: Pr
       })
     : [];
 
+  const conditionOptions = await getConditions();
+
   const photoUrl = (path: string) =>
     `${publicEnv.SUPABASE_URL}/storage/v1/object/public/product-photos/${path}`;
 
@@ -47,6 +50,7 @@ export default async function RecherchePage({ searchParams }: { searchParams: Pr
         initialAvailable={sp.available === '1'}
         initialConditions={conditions ?? []}
         initialSort={sp.sort ?? 'relevance'}
+        conditions={conditionOptions}
       />
 
       <p className="text-sm text-bronze mt-6">
@@ -64,7 +68,7 @@ export default async function RecherchePage({ searchParams }: { searchParams: Pr
                 )}
               </div>
               <div className="p-3">
-                <div className="text-xs text-bronze uppercase tracking-wider">{p.subcategory_name} · {conditionLabel(p.condition as Condition)}</div>
+                <div className="text-xs text-bronze uppercase tracking-wider">{p.subcategory_name} · {conditionLabel(p.condition, conditionOptions)}</div>
                 <h3 className="font-serif text-base mt-1">{p.name}</h3>
                 <p className="font-semibold mt-1">{formatPrice(p.price_cents)}</p>
               </div>

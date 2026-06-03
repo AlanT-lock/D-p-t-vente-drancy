@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { NewProductForm } from '@/components/admin/new-product-form';
 import { createProductReturningId } from '../actions';
 import { addPhoto } from '../photo-actions';
+import { getConditions } from '@/lib/repos/conditions';
 
 type Cat = {
   id: string;
@@ -20,6 +21,7 @@ export default async function NewProductPage({
     .from('categories')
     .select('*, subcategories(*)')
     .order('position');
+  const conditions = await getConditions();
 
   return (
     <div>
@@ -27,6 +29,7 @@ export default async function NewProductPage({
       <NewProductForm
         categories={(cats as unknown as Cat[]) ?? []}
         adminSlug={adminSlug}
+        conditions={conditions}
         createAction={createProductReturningId}
         addPhotoAction={addPhoto}
       />

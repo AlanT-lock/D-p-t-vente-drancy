@@ -2,14 +2,14 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { ProductRow } from '@/components/admin/product-row';
 import { deleteProductFromListForm, setProductQuantity } from './actions';
-import type { Condition } from '@/lib/condition';
+import { getConditions } from '@/lib/repos/conditions';
 
 type Row = {
   id: string;
   name: string;
   price_cents: number;
   quantity: number;
-  condition: Condition;
+  condition: string;
   is_published: boolean;
   created_at: string;
   subcategory_id: string | null;
@@ -36,6 +36,7 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
 
   const products = (productsData ?? []) as unknown as Row[];
   const categories = (catsData ?? []) as unknown as Cat[];
+  const conditions = await getConditions();
 
   const subToCat = new Map<string, string>();
   categories.forEach((c) => (c.subcategories ?? []).forEach((s) => subToCat.set(s.id, c.id)));
@@ -94,6 +95,7 @@ export default async function ProductsAdmin({ params }: { params: Promise<{ admi
                       adminSlug={adminSlug}
                       setQuantity={setProductQuantity.bind(null, p.id)}
                       deleteAction={deleteProductFromListForm}
+                      conditions={conditions}
                     />
                   ))}
                 </ul>

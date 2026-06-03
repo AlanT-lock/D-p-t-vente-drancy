@@ -5,6 +5,7 @@ import { listProductsBySubcategory, type ListOpts } from '@/lib/repos/products';
 import { ProductGrid } from '@/components/vitrine/product-grid';
 import { Filters } from '@/components/vitrine/filters';
 import { SortSelect } from '@/components/vitrine/sort-select';
+import { getConditions } from '@/lib/repos/conditions';
 
 export const revalidate = 60;
 
@@ -29,6 +30,7 @@ export default async function SubcategoryPage({
     availableOnly: sp.available === '1',
   };
   const products = await listProductsBySubcategory(sub.id, opts);
+  const conditions = await getConditions();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -44,8 +46,8 @@ export default async function SubcategoryPage({
           <p className="text-sm text-bronze">{products.length} produit{products.length > 1 ? 's' : ''}</p>
           <SortSelect />
         </div>
-        <Filters />
-        <ProductGrid products={products} subcategoryNameById={{ [sub.id]: sub.name }} />
+        <Filters conditions={conditions} />
+        <ProductGrid products={products} subcategoryNameById={{ [sub.id]: sub.name }} conditions={conditions} />
       </div>
     </div>
   );

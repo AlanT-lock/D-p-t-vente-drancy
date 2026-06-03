@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Trash2, Check, Loader2 } from 'lucide-react';
 import { publicEnv } from '@/lib/env';
 import { formatPrice } from '@/lib/format';
-import { conditionLabel, type Condition } from '@/lib/condition';
+import { conditionLabel, DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 
 type Photo = { storage_path: string; position: number };
 type Product = {
@@ -14,7 +14,7 @@ type Product = {
   name: string;
   price_cents: number;
   quantity: number;
-  condition: Condition;
+  condition: string;
   is_published: boolean;
   photos: Photo[];
 };
@@ -24,12 +24,14 @@ export function ProductRow({
   adminSlug,
   setQuantity,
   deleteAction,
+  conditions = DEFAULT_CONDITIONS,
 }: {
   product: Product;
   adminSlug: string;
   setQuantity: (formData: FormData) => Promise<void>;
   /** Server action qui supprime, prend FormData (avec id). */
   deleteAction: (formData: FormData) => Promise<void>;
+  conditions?: ConditionOption[];
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +69,7 @@ export function ProductRow({
           {!product.is_published && <span className="text-xs text-bronze">(masqué)</span>}
         </Link>
         <div className="text-xs text-bronze truncate">
-          {formatPrice(product.price_cents)} · {conditionLabel(product.condition)}
+          {formatPrice(product.price_cents)} · {conditionLabel(product.condition, conditions)}
         </div>
       </div>
 

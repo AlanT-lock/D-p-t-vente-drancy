@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { ImagePlus, Loader2, X, Camera } from 'lucide-react';
-import { CONDITIONS } from '@/lib/condition';
+import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 import { uid } from '@/lib/uid';
 import { compressToWebpFile, dataUrlToFile, fileToDataUrl } from '@/lib/image';
 import { CameraCapture } from './camera-capture';
@@ -17,11 +17,13 @@ const MAX_PHOTOS = 5;
 export function NewProductForm({
   categories,
   adminSlug,
+  conditions = DEFAULT_CONDITIONS,
   createAction,
   addPhotoAction,
 }: {
   categories: Cat[];
   adminSlug: string;
+  conditions?: ConditionOption[];
   createAction: (formData: FormData) => Promise<{ id: string } | { error: string }>;
   /** Server action : reçoit FormData (productId + photo File). */
   addPhotoAction: (formData: FormData) => Promise<void>;
@@ -252,11 +254,11 @@ export function NewProductForm({
           <select
             name="condition"
             required
-            defaultValue="bon_etat"
+            defaultValue={conditions[0]?.slug}
             className="w-full rounded border border-navy/20 px-3 py-2"
           >
-            {CONDITIONS.map((c) => (
-              <option key={c.value} value={c.value}>
+            {conditions.map((c) => (
+              <option key={c.slug} value={c.slug}>
                 {c.label}
               </option>
             ))}

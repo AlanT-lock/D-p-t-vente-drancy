@@ -42,7 +42,7 @@ export async function searchProducts(query: string, opts: SearchOpts = {}): Prom
     q = q.eq('subcategory.category.slug', opts.categorySlug);
   }
   if (opts.conditions?.length) {
-    q = q.in('condition', opts.conditions as ('neuf' | 'tres_bon_etat' | 'bon_etat' | 'etat_usage')[]);
+    q = q.in('condition', opts.conditions);
   }
   if (opts.minPriceCents != null) q = q.gte('price_cents', opts.minPriceCents);
   if (opts.maxPriceCents != null) q = q.lte('price_cents', opts.maxPriceCents);
@@ -74,7 +74,7 @@ export async function searchProducts(query: string, opts: SearchOpts = {}): Prom
   type Row = {
     id: string; slug: string; name: string; description: string | null;
     price_cents: number; quantity: number;
-    condition: 'neuf' | 'tres_bon_etat' | 'bon_etat' | 'etat_usage';
+    condition: string;
     is_published: boolean; created_at: string; updated_at: string;
     subcategory_id: string;
     photos: { id: string; product_id: string; storage_path: string; position: number }[];

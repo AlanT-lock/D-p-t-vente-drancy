@@ -1,5 +1,6 @@
 import { listCategoriesWithSubs } from '@/lib/repos/categories';
 import { listRecentPublishedProducts } from '@/lib/repos/products';
+import { getConditions } from '@/lib/repos/conditions';
 import { StoreBanner } from '@/components/vitrine/store-banner';
 import { Hero } from '@/components/vitrine/hero';
 import { CategoryTiles } from '@/components/vitrine/category-tiles';
@@ -9,9 +10,10 @@ import { GoogleReviews } from '@/components/vitrine/google-reviews';
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [categories, recent] = await Promise.all([
+  const [categories, recent, conditions] = await Promise.all([
     listCategoriesWithSubs(),
     listRecentPublishedProducts(6),
+    getConditions(),
   ]);
   return (
     <>
@@ -19,7 +21,7 @@ export default async function HomePage() {
       <Hero />
       <section className="mx-auto max-w-7xl px-4 py-12">
         <h2 className="font-serif text-3xl mb-6">Récemment ajoutés</h2>
-        <ProductGrid products={recent} />
+        <ProductGrid products={recent} conditions={conditions} />
       </section>
       <CategoryTiles categories={categories} />
       <GoogleReviews />

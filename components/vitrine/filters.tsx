@@ -2,9 +2,15 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { SlidersHorizontal, X } from 'lucide-react';
-import { CONDITIONS } from '@/lib/condition';
+import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 
-export function Filters({ maxPriceDefault = 1000 }: { maxPriceDefault?: number }) {
+export function Filters({
+  maxPriceDefault = 1000,
+  conditions = DEFAULT_CONDITIONS,
+}: {
+  maxPriceDefault?: number;
+  conditions?: ConditionOption[];
+}) {
   const router = useRouter();
   const path = usePathname();
   const params = useSearchParams();
@@ -78,16 +84,16 @@ export function Filters({ maxPriceDefault = 1000 }: { maxPriceDefault?: number }
           <section>
             <h3 className="font-serif text-xs uppercase tracking-wider text-bronze mb-2">État</h3>
             <ul className="space-y-1">
-              {CONDITIONS.map((c) => (
-                <li key={c.value}>
+              {conditions.map((c) => (
+                <li key={c.slug}>
                   <label className="flex items-center gap-2 text-sm">
                     <input
                       type="checkbox"
-                      checked={selectedConditions.has(c.value)}
+                      checked={selectedConditions.has(c.slug)}
                       onChange={(e) => {
                         const next = new Set(selectedConditions);
-                        if (e.target.checked) next.add(c.value);
-                        else next.delete(c.value);
+                        if (e.target.checked) next.add(c.slug);
+                        else next.delete(c.slug);
                         setParam('conditions', Array.from(next).join(','));
                       }}
                     />{' '}
