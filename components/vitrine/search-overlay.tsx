@@ -117,7 +117,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
               inputMode="search"
               autoCapitalize="off"
               autoCorrect="off"
-              className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
+              className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm text-navy placeholder:text-bronze"
             />
           </div>
           <button
@@ -159,7 +159,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-serif text-sm truncate">{hit.name}</div>
+                    <div className="font-serif text-sm truncate text-navy">{hit.name}</div>
                     <div className="text-xs text-bronze">
                       {hit.subcategory_name} · {formatPrice(hit.price_cents)}
                     </div>

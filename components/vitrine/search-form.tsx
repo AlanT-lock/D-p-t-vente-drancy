@@ -2,7 +2,7 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { Search } from 'lucide-react';
-import { CONDITIONS } from '@/lib/condition';
+import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 
 export function SearchForm({
   initialQuery,
@@ -10,12 +10,14 @@ export function SearchForm({
   initialAvailable,
   initialConditions,
   initialSort,
+  conditions = DEFAULT_CONDITIONS,
 }: {
   initialQuery: string;
   initialMaxPrice: string;
   initialAvailable: boolean;
   initialConditions: string[];
   initialSort: string;
+  conditions?: ConditionOption[];
 }) {
   const router = useRouter();
   const path = usePathname();
@@ -48,16 +50,16 @@ export function SearchForm({
         <section>
           <h3 className="font-serif uppercase tracking-wider text-bronze text-xs mb-2">État</h3>
           <ul className="space-y-1">
-            {CONDITIONS.map((c) => (
-              <li key={c.value}>
+            {conditions.map((c) => (
+              <li key={c.slug}>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    defaultChecked={conds.has(c.value)}
+                    defaultChecked={conds.has(c.slug)}
                     onChange={(e) => {
                       const next = new Set(conds);
-                      if (e.target.checked) next.add(c.value);
-                      else next.delete(c.value);
+                      if (e.target.checked) next.add(c.slug);
+                      else next.delete(c.slug);
                       setParam('conditions', Array.from(next).join(','));
                     }}
                   /> {c.label}
@@ -102,7 +104,7 @@ export function SearchForm({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher…"
-          className="flex-1 bg-transparent outline-none text-sm"
+          className="flex-1 bg-transparent outline-none text-sm text-navy placeholder:text-bronze"
         />
         <button type="submit" className="text-xs underline text-bronze">Rechercher</button>
       </form>

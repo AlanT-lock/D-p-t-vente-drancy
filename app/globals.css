@@ -55,6 +55,10 @@
 }
 
 :root {
+  /* Thème clair uniquement : empêche les navigateurs (mobiles surtout) en mode
+     sombre d'auto-assombrir les champs de formulaire — sinon texte blanc sur
+     fond parchemin clair (« blanc sur blanc ») dans les barres de recherche. */
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { getProductBySlug, listProductsBySubcategory } from '@/lib/repos/products';
 import { createClient } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/format';
-import { conditionLabel, type Condition } from '@/lib/condition';
+import { conditionLabel } from '@/lib/condition';
+import { getConditions } from '@/lib/repos/conditions';
 import { ProductGallery } from '@/components/vitrine/product-gallery';
 import { ProductCTA } from '@/components/vitrine/product-cta';
 import { ProductGrid } from '@/components/vitrine/product-grid';
@@ -37,6 +38,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   const suggestions = sub ? await listProductsBySubcategory(sub.id) : [];
   const others = suggestions.filter((p) => p.id !== product.id).slice(0, 4);
+  const conditions = await getConditions();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -49,12 +51,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
       <div className="grid md:grid-cols-2 gap-10">
         <ProductGallery photos={product.photos} name={product.name} />
-        <div>
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-wider text-bronze">
             {sub ? `${sub.name} · ` : ''}
-            {conditionLabel(product.condition as Condition)}
+            {conditionLabel(product.condition, conditions)}
           </p>
-          <h1 className="font-serif text-4xl mt-2">{product.name}</h1>
+          <h1 className="font-serif text-4xl mt-2 break-words">{product.name}</h1>
           <p className="text-2xl font-semibold mt-3">{formatPrice(product.price_cents)}</p>
           {product.quantity === 0 ? (
             <p className="text-sm text-red-700 mt-1 font-semibold">Plus disponible</p>
@@ -64,7 +66,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <p className="text-sm text-bronze mt-1">{product.quantity} exemplaires disponibles</p>
           )}
           {product.description && (
-            <div className="mt-6 text-sm leading-relaxed whitespace-pre-wrap">
+            <div className="mt-6 text-sm leading-relaxed whitespace-pre-wrap break-words">
               {product.description}
             </div>
           )}
@@ -75,7 +77,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       {sub && others.length > 0 && (
         <section className="mt-16">
           <h2 className="font-serif text-2xl mb-6">Dans la même catégorie</h2>
-          <ProductGrid products={others} subcategoryNameById={{ [sub.id]: sub.name }} />
+          <ProductGrid products={others} subcategoryNameById={{ [sub.id]: sub.name }} conditions={conditions} />
         </section>
       )}
     </div>

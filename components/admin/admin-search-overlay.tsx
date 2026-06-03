@@ -125,7 +125,7 @@ export function AdminSearchOverlay({
               inputMode="search"
               autoCapitalize="off"
               autoCorrect="off"
-              className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm"
+              className="flex-1 min-w-0 bg-transparent outline-none text-base sm:text-sm text-navy placeholder:text-bronze"
             />
           </div>
         </div>
@@ -161,7 +161,7 @@ export function AdminSearchOverlay({
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-serif text-sm truncate inline-flex items-center gap-1.5">
+                    <div className="font-serif text-sm truncate inline-flex items-center gap-1.5 text-navy">
                       {hit.name}
                       {!hit.is_published && (
                         <EyeOff
