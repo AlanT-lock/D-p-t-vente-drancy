@@ -1,5 +1,6 @@
 import { Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { business } from '@/lib/business';
 
@@ -61,9 +62,17 @@ export async function GoogleReviews() {
           </article>
         ))}
       </div>
-      <p className="mt-4 text-xs">
-        <a href={business.googleBusinessUrl} target="_blank" rel="noopener" className="underline">Voir tous les avis sur Google →</a>
-      </p>
+      <div className="mt-4 flex items-center gap-4 flex-wrap">
+        <Link
+          href="/informations"
+          className="rounded-full border border-navy/30 px-5 py-2.5 text-sm font-semibold"
+        >
+          Informations
+        </Link>
+        <a href={business.googleBusinessUrl} target="_blank" rel="noopener" className="text-xs underline">
+          Voir tous les avis sur Google →
+        </a>
+      </div>
     </section>
   );
 }

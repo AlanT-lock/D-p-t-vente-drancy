@@ -13,9 +13,12 @@ export function Hero() {
       <p className="mt-4 max-w-xl text-bronze">
         Mobilier, décoration, vaisselle, vêtements… chaque pièce a une histoire. Venez sur place.
       </p>
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex gap-3 flex-wrap">
         <Link href="/categories" className="rounded-full bg-navy text-parchment px-5 py-2.5 text-sm font-semibold">
           Voir les catégories
+        </Link>
+        <Link href="/informations" className="rounded-full border border-navy/30 px-5 py-2.5 text-sm font-semibold">
+          Informations
         </Link>
         <Link href="/contact" className="rounded-full border border-navy/30 px-5 py-2.5 text-sm font-semibold">
           Nous trouver
