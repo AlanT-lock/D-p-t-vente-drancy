@@ -17,6 +17,12 @@ const productSchema = z.object({
     .or(z.literal('').transform(() => null))
     .or(z.literal('none').transform(() => null)),
   price: z.string().min(1),
+  // Prix neuf optionnel : vide ou nombre (1 ou 2 décimales).
+  original_price: z
+    .string()
+    .optional()
+    .transform((v) => (v ?? '').trim())
+    .refine((v) => v === '' || /^\d+([.,]\d{1,2})?$/.test(v), 'Prix neuf invalide'),
   quantity: z.coerce.number().int().min(0),
   // États dynamiques (table product_conditions). La FK products.condition garantit
   // la validité côté base ; le formulaire ne propose que des états existants.
@@ -40,6 +46,7 @@ export async function createProductReturningId(
     name: formData.get('name'),
     subcategory_id: formData.get('subcategory_id'),
     price: formData.get('price'),
+    original_price: formData.get('original_price') ?? '',
     quantity: formData.get('quantity'),
     condition: formData.get('condition'),
     description: formData.get('description') ?? '',
@@ -61,6 +68,7 @@ export async function createProductReturningId(
       slug,
       subcategory_id: parsed.data.subcategory_id,
       price_cents: parsePrice(parsed.data.price),
+      original_price_cents: parsed.data.original_price ? parsePrice(parsed.data.original_price) : null,
       quantity: parsed.data.quantity,
       condition: parsed.data.condition,
       description: parsed.data.description ?? null,
@@ -79,6 +87,7 @@ export async function createProduct(formData: FormData): Promise<void> {
     name: formData.get('name'),
     subcategory_id: formData.get('subcategory_id'),
     price: formData.get('price'),
+    original_price: formData.get('original_price') ?? '',
     quantity: formData.get('quantity'),
     condition: formData.get('condition'),
     description: formData.get('description') ?? '',
@@ -97,6 +106,7 @@ export async function createProduct(formData: FormData): Promise<void> {
       slug,
       subcategory_id: parsed.data.subcategory_id,
       price_cents: parsePrice(parsed.data.price),
+      original_price_cents: parsed.data.original_price ? parsePrice(parsed.data.original_price) : null,
       quantity: parsed.data.quantity,
       condition: parsed.data.condition,
       description: parsed.data.description ?? null,
@@ -115,6 +125,7 @@ export async function updateProduct(id: string, formData: FormData): Promise<voi
     name: formData.get('name'),
     subcategory_id: formData.get('subcategory_id'),
     price: formData.get('price'),
+    original_price: formData.get('original_price') ?? '',
     quantity: formData.get('quantity'),
     condition: formData.get('condition'),
     description: formData.get('description') ?? '',
@@ -127,6 +138,7 @@ export async function updateProduct(id: string, formData: FormData): Promise<voi
       name: parsed.data.name,
       subcategory_id: parsed.data.subcategory_id,
       price_cents: parsePrice(parsed.data.price),
+      original_price_cents: parsed.data.original_price ? parsePrice(parsed.data.original_price) : null,
       quantity: parsed.data.quantity,
       condition: parsed.data.condition,
       description: parsed.data.description ?? null,

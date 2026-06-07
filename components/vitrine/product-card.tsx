@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { formatPrice } from '@/lib/format';
 import { publicEnv } from '@/lib/env';
 import type { ProductWithPhotos } from '@/lib/repos/types';
 import type { ConditionOption } from '@/lib/condition';
 import { ConditionBadge } from './condition-badge';
+import { ProductPrice } from './product-price';
 
 export function ProductCard({
   product,
@@ -46,7 +46,11 @@ export function ProductCard({
             <ConditionBadge condition={product.condition} conditions={conditions} />
           </div>
           <h3 className="font-serif text-base mt-1">{product.name}</h3>
-          <p className="font-semibold mt-1">{formatPrice(product.price_cents)}</p>
+          <ProductPrice
+            priceCents={product.price_cents}
+            originalCents={product.original_price_cents}
+            className="mt-1"
+          />
         </div>
       </article>
     </Link>

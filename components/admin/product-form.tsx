@@ -19,6 +19,7 @@ export function ProductForm({
   defaults?: {
     name?: string;
     price?: string;
+    original_price?: string;
     quantity?: number;
     condition?: string;
     description?: string;
@@ -53,8 +54,11 @@ export function ProductForm({
       </Field>
 
       <div className="grid grid-cols-2 gap-3">
-        <Field label="Prix (€)">
+        <Field label="Prix dépôt-vente (€)">
           <input name="price" required defaultValue={defaults?.price} inputMode="decimal" className="w-full rounded border border-navy/20 px-3 py-2" />
+        </Field>
+        <Field label="Prix neuf (€, optionnel)">
+          <input name="original_price" defaultValue={defaults?.original_price} inputMode="decimal" placeholder="—" className="w-full rounded border border-navy/20 px-3 py-2" />
         </Field>
         <Field label="Quantité">
           <input name="quantity" type="number" min={0} required defaultValue={defaults?.quantity ?? 1} className="w-full rounded border border-navy/20 px-3 py-2" />

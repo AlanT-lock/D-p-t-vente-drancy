@@ -8,6 +8,7 @@ const mockProduct: ProductWithPhotos = {
   slug: 'fauteuil-club',
   name: 'Fauteuil club',
   price_cents: 24000,
+  original_price_cents: null,
   quantity: 1,
   condition: 'bon_etat',
   subcategory_id: 's1',

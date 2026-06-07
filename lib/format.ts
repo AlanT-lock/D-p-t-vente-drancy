@@ -18,6 +18,17 @@ export function formatPrice(cents: number): string {
   return `${sign}${whole},${String(decimals).padStart(2, '0')} €`;
 }
 
+/**
+ * Réduction en pourcentage (entier) entre un prix neuf et le prix de vente.
+ * Renvoie 0 s'il n'y a pas de réduction réelle (prix neuf absent, nul, ou
+ * inférieur/égal au prix de vente) — le composant d'affichage peut alors masquer.
+ */
+export function discountPercent(originalCents: number | null | undefined, currentCents: number): number {
+  if (!originalCents || originalCents <= 0) return 0;
+  if (currentCents < 0 || currentCents >= originalCents) return 0;
+  return Math.round((1 - currentCents / originalCents) * 100);
+}
+
 export function parsePrice(input: string): number {
   const normalized = input.replace(',', '.').trim();
   const num = Number(normalized);

@@ -73,7 +73,7 @@ export async function searchProducts(query: string, opts: SearchOpts = {}): Prom
 
   type Row = {
     id: string; slug: string; name: string; description: string | null;
-    price_cents: number; quantity: number;
+    price_cents: number; original_price_cents: number | null; quantity: number;
     condition: string;
     is_published: boolean; created_at: string; updated_at: string;
     subcategory_id: string;
@@ -87,6 +87,7 @@ export async function searchProducts(query: string, opts: SearchOpts = {}): Prom
     name: p.name,
     description: p.description,
     price_cents: p.price_cents,
+    original_price_cents: p.original_price_cents,
     quantity: p.quantity,
     condition: p.condition,
     is_published: p.is_published,

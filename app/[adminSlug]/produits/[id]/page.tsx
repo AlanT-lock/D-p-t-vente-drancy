@@ -11,6 +11,7 @@ type ProductWithPhotos = {
   id: string;
   name: string;
   price_cents: number;
+  original_price_cents: number | null;
   quantity: number;
   condition: string;
   description: string | null;
@@ -60,6 +61,10 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           defaults={{
             name: product.name,
             price: (product.price_cents / 100).toFixed(2),
+            original_price:
+              product.original_price_cents != null
+                ? (product.original_price_cents / 100).toFixed(2)
+                : '',
             quantity: product.quantity,
             condition: product.condition,
             description: product.description ?? '',

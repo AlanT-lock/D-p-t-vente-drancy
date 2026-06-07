@@ -33,6 +33,7 @@ export type Database = {
           slug: string;
           description: string | null;
           price_cents: number;
+          original_price_cents: number | null;
           quantity: number;
           condition: string;
           is_published: boolean;
@@ -46,6 +47,7 @@ export type Database = {
           slug: string;
           description?: string | null;
           price_cents: number;
+          original_price_cents?: number | null;
           quantity?: number;
           condition: string;
           is_published?: boolean;

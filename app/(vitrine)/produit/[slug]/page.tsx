@@ -2,12 +2,12 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getProductBySlug, listProductsBySubcategory } from '@/lib/repos/products';
 import { createClient } from '@/lib/supabase/server';
-import { formatPrice } from '@/lib/format';
 import { conditionLabel } from '@/lib/condition';
 import { getConditions } from '@/lib/repos/conditions';
 import { ProductGallery } from '@/components/vitrine/product-gallery';
 import { ProductCTA } from '@/components/vitrine/product-cta';
 import { ProductGrid } from '@/components/vitrine/product-grid';
+import { ProductPrice } from '@/components/vitrine/product-price';
 
 export const revalidate = 60;
 
@@ -57,7 +57,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {conditionLabel(product.condition, conditions)}
           </p>
           <h1 className="font-serif text-4xl mt-2 break-words">{product.name}</h1>
-          <p className="text-2xl font-semibold mt-3">{formatPrice(product.price_cents)}</p>
+          <ProductPrice
+            priceCents={product.price_cents}
+            originalCents={product.original_price_cents}
+            size="lg"
+            className="mt-3"
+          />
           {product.quantity === 0 ? (
             <p className="text-sm text-red-700 mt-1 font-semibold">Plus disponible</p>
           ) : product.quantity === 1 ? (

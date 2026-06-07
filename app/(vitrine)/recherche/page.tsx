@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { searchProducts } from '@/lib/search/products';
-import { formatPrice } from '@/lib/format';
+import { ProductPrice } from '@/components/vitrine/product-price';
 import { conditionLabel } from '@/lib/condition';
 import { getConditions } from '@/lib/repos/conditions';
 import { publicEnv } from '@/lib/env';
@@ -70,7 +70,11 @@ export default async function RecherchePage({ searchParams }: { searchParams: Pr
               <div className="p-3">
                 <div className="text-xs text-bronze uppercase tracking-wider">{p.subcategory_name} · {conditionLabel(p.condition, conditionOptions)}</div>
                 <h3 className="font-serif text-base mt-1">{p.name}</h3>
-                <p className="font-semibold mt-1">{formatPrice(p.price_cents)}</p>
+                <ProductPrice
+                  priceCents={p.price_cents}
+                  originalCents={p.original_price_cents}
+                  className="mt-1"
+                />
               </div>
             </Link>
           );

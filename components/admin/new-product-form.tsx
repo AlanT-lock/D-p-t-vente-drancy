@@ -221,11 +221,19 @@ export function NewProductForm({
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Prix (€)">
+          <Field label="Prix dépôt-vente (€)">
             <input
               name="price"
               required
               inputMode="decimal"
+              className="w-full rounded border border-navy/20 px-3 py-2"
+            />
+          </Field>
+          <Field label="Prix neuf (€, optionnel)">
+            <input
+              name="original_price"
+              inputMode="decimal"
+              placeholder="—"
               className="w-full rounded border border-navy/20 px-3 py-2"
             />
           </Field>
