@@ -7,6 +7,16 @@ import { slugify } from '@/lib/slugify';
 import { parsePrice } from '@/lib/format';
 import { ensureUniqueSlug } from '@/lib/unique-slug';
 
+// Rafraîchit les pages vitrine impactées par un changement de produit, pour que
+// les modifications (prix, prix neuf, etc.) apparaissent tout de suite côté client
+// au lieu d'attendre l'expiration du cache ISR (60s).
+function revalidatePublicProductPages() {
+  revalidatePath('/');
+  revalidatePath('/produit/[slug]', 'page');
+  revalidatePath('/c/[category]', 'page');
+  revalidatePath('/c/[category]/[subcategory]', 'page');
+}
+
 const productSchema = z.object({
   name: z.string().min(1),
   // Sous-catégorie optionnelle : '' ou null acceptés
@@ -78,6 +88,7 @@ export async function createProductReturningId(
     .single();
   if (error || !data) return { error: error?.message ?? 'Erreur de création' };
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
   return { id: data.id };
 }
 
@@ -116,6 +127,7 @@ export async function createProduct(formData: FormData): Promise<void> {
     .single();
   if (error || !data) return;
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
   redirect(`/${process.env.ADMIN_SLUG}/produits/${data.id}`);
 }
 
@@ -146,12 +158,14 @@ export async function updateProduct(id: string, formData: FormData): Promise<voi
     })
     .eq('id', id);
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
 }
 
 export async function deleteProduct(id: string): Promise<void> {
   const supabase = await requireAuth();
   await supabase.from('products').delete().eq('id', id);
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
   redirect(`/${process.env.ADMIN_SLUG}/produits`);
 }
 
@@ -160,6 +174,7 @@ export async function deleteProductFromList(id: string): Promise<void> {
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) throw new Error(`Suppression : ${error.message}`);
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
 }
 
 /** Variante FormData (passée comme `action` à un form, ou via fd.append). */
@@ -175,4 +190,5 @@ export async function setProductQuantity(id: string, formData: FormData): Promis
   if (!Number.isInteger(q) || q < 0) return;
   await supabase.from('products').update({ quantity: q }).eq('id', id);
   revalidatePath(`/${process.env.ADMIN_SLUG}/produits`);
+  revalidatePublicProductPages();
 }
