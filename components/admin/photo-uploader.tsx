@@ -8,8 +8,6 @@ import { addPhoto, deletePhoto } from '@/app/[adminSlug]/produits/photo-actions'
 import { compressToWebpFile, dataUrlToFile } from '@/lib/image';
 import { CameraCapture } from './camera-capture';
 
-const MAX_PHOTOS = 5;
-
 export function PhotoUploader({
   productId,
   initial,
@@ -25,12 +23,10 @@ export function PhotoUploader({
   const url = (p: string) =>
     `${publicEnv.SUPABASE_URL}/storage/v1/object/public/product-photos/${p}`;
   const sorted = [...initial].sort((a, b) => a.position - b.position);
-  const remainingSlots = Math.max(0, MAX_PHOTOS - sorted.length);
 
   const uploadFiles = async (files: File[]) => {
     setError(null);
-    const list = files.slice(0, remainingSlots);
-    for (const file of list) {
+    for (const file of files) {
       setPending((n) => n + 1);
       try {
         const compressed = await compressToWebpFile(file);
@@ -65,7 +61,7 @@ export function PhotoUploader({
 
       <div className="flex items-center justify-between mb-2">
         <p className="text-xs text-bronze">
-          {sorted.length} / {MAX_PHOTOS} photo{sorted.length > 1 ? 's' : ''}
+          {sorted.length} photo{sorted.length > 1 ? 's' : ''}
           {sorted.length === 0 &&
             " — ajoute au moins une photo pour que le produit s'affiche sur le site"}
         </p>
@@ -76,8 +72,7 @@ export function PhotoUploader({
         )}
       </div>
 
-      {remainingSlots > 0 && (
-        <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setCameraOpen(true)}
@@ -103,8 +98,7 @@ export function PhotoUploader({
               }}
             />
           </label>
-        </div>
-      )}
+      </div>
 
       {error && <p className="text-xs text-red-700 mt-2">⚠ {error}</p>}
 
@@ -146,11 +140,6 @@ export function PhotoUploader({
         </div>
       )}
 
-      {sorted.length === MAX_PHOTOS && (
-        <p className="text-xs text-bronze italic mt-2">
-          Limite de {MAX_PHOTOS} photos atteinte. Supprime-en une pour en ajouter d&apos;autres.
-        </p>
-      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
+import { AutoGrowTextarea } from './auto-grow-textarea';
 
 type Sub = { id: string; name: string; category_id: string };
 type Cat = { id: string; name: string; subcategories: Sub[] };
@@ -67,7 +68,7 @@ export function ProductForm({
       </Field>
 
       <Field label="Description">
-        <textarea name="description" defaultValue={defaults?.description} rows={5} className="w-full rounded border border-navy/20 px-3 py-2" />
+        <AutoGrowTextarea name="description" defaultValue={defaults?.description} rows={5} className="w-full rounded border border-navy/20 px-3 py-2" />
       </Field>
 
       <label className="flex items-center gap-2 text-sm">

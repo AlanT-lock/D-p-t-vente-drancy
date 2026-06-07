@@ -50,10 +50,10 @@ export async function addPhoto(formData: FormData): Promise<void> {
     .order('position');
   if (existingErr) throw new Error(`Lecture photos : ${existingErr.message}`);
 
+  // Première position libre (pas de plafond : nombre de photos illimité).
   const usedPositions = new Set((existing ?? []).map((p) => p.position));
   let nextPos = 0;
-  while (usedPositions.has(nextPos) && nextPos < 5) nextPos++;
-  if (nextPos > 4) throw new Error('Maximum 5 photos atteint pour ce produit');
+  while (usedPositions.has(nextPos)) nextPos++;
 
   // 3) Convertir le File en Buffer Node
   const arrayBuf = await file.arrayBuffer();

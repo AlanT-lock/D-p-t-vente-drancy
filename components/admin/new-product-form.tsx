@@ -7,12 +7,11 @@ import { DEFAULT_CONDITIONS, type ConditionOption } from '@/lib/condition';
 import { uid } from '@/lib/uid';
 import { compressToWebpFile, dataUrlToFile, fileToDataUrl } from '@/lib/image';
 import { CameraCapture } from './camera-capture';
+import { AutoGrowTextarea } from './auto-grow-textarea';
 
 type Sub = { id: string; name: string; category_id: string };
 type Cat = { id: string; name: string; subcategories: Sub[] };
 type PendingPhoto = { id: string; previewUrl: string; file: File };
-
-const MAX_PHOTOS = 5;
 
 export function NewProductForm({
   categories,
@@ -37,14 +36,12 @@ export function NewProductForm({
   const [cameraOpen, setCameraOpen] = useState(false);
 
   const subs = categories.find((c) => c.id === categoryId)?.subcategories ?? [];
-  const remaining = MAX_PHOTOS - photos.length;
 
   const ingestFiles = async (files: File[]) => {
     setError(null);
     setCompressing(true);
     try {
-      const list = files.slice(0, Math.max(0, MAX_PHOTOS - photos.length));
-      for (const file of list) {
+      for (const file of files) {
         const compressed = await compressToWebpFile(file);
         const previewUrl = await fileToDataUrl(compressed);
         setPhotos((prev) => [...prev, { id: uid(), file: compressed, previewUrl }]);
@@ -110,12 +107,11 @@ export function NewProductForm({
           <div className="flex items-baseline justify-between mb-2">
             <h2 className="font-serif text-xl">Photos du produit</h2>
             <span className="text-xs text-bronze">
-              {photos.length} / {MAX_PHOTOS}
+              {photos.length} photo{photos.length > 1 ? 's' : ''}
             </span>
           </div>
 
-          {photos.length < MAX_PHOTOS && (
-            <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setCameraOpen(true)}
@@ -150,15 +146,10 @@ export function NewProductForm({
                   }}
                 />
               </label>
-            </div>
-          )}
-          {photos.length < MAX_PHOTOS && (
-            <p className="text-[11px] text-bronze mt-2 text-center">
-              {remaining === MAX_PHOTOS
-                ? `Jusqu'à ${MAX_PHOTOS} photos`
-                : `Encore ${remaining} photo${remaining > 1 ? 's' : ''} possible${remaining > 1 ? 's' : ''}`}
-            </p>
-          )}
+          </div>
+          <p className="text-[11px] text-bronze mt-2 text-center">
+            Ajoutez autant de photos que nécessaire
+          </p>
 
           {photos.length > 0 && (
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-3">
@@ -266,7 +257,7 @@ export function NewProductForm({
         </Field>
 
         <Field label="Description">
-          <textarea
+          <AutoGrowTextarea
             name="description"
             rows={5}
             className="w-full rounded border border-navy/20 px-3 py-2"
